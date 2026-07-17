@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import { logger } from "@repo/logger";
 import cors from "cors";
 
@@ -27,6 +28,7 @@ if (env.NODE_ENV !== "prod") {
 }
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   return res.json({ message: "Zenith Form is up and running..." });
