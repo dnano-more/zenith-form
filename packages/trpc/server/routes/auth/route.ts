@@ -16,4 +16,20 @@ export const authRouter = router({
       const supportedMethods = await userService.getAuthenticationMethods();
       return supportedMethods;
     }),
+  loginAsGuest: publicProcedure
+    .meta({ openapi: { method: "POST", path: getPath("/guest-login"), tags: TAGS } })
+    .input(zodUndefinedModel)
+    .output(z.object({ success: z.literal(true) }))
+    .mutation(async ({ ctx }) => {
+      const { sessionToken } = await userService.loginAsGuest();
+
+      ctx.res.cookie("session_token", sessionToken, {
+        httpOnly: true,
+        secure: ["prod", "production"].includes(process.env.NODE_ENV ?? ""),
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      return { success: true };
+    }),
 });

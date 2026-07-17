@@ -6,6 +6,9 @@ import { env } from "../env";
 import { googleOAuth2Client } from "../clients/google-oauth";
 import { GetAuthenticationMethodOutputSchema } from "./model";
 
+const GUEST_EMAIL = "demo@zenithform.com";
+const GUEST_NAME = "Demo User";
+
 class UserService {
   public async getAuthenticationMethods(): Promise<
     ReadonlyArray<GetAuthenticationMethodOutputSchema>
@@ -81,6 +84,38 @@ class UserService {
     });
 
     return { user, sessionToken };
+  }
+
+  public async loginAsGuest() {
+    const [existingGuest] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, GUEST_EMAIL))
+      .limit(1);
+
+    const guestUser =
+      existingGuest ??
+      (
+        await db
+          .insert(usersTable)
+          .values({
+            fullName: GUEST_NAME,
+            email: GUEST_EMAIL,
+            emailVerified: true,
+          })
+          .returning()
+      )[0];
+
+    if (!guestUser) {
+      throw new Error("Failed to create guest user");
+    }
+
+    const sessionToken = signSessionToken({
+      userId: guestUser.id,
+      email: guestUser.email,
+    });
+
+    return { user: guestUser, sessionToken };
   }
 }
 
