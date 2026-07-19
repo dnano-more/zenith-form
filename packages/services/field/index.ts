@@ -121,7 +121,25 @@ class FieldService {
   public async reorderFields(userId: string, formId: string, orderedFieldIds: string[]) {
     await this.assertFormOwnership(formId, userId);
 
-    // har field ka naya order sequentially update karo
+    const existingFields = await db
+      .select({ id: formFieldsTable.id })
+      .from(formFieldsTable)
+      .where(eq(formFieldsTable.formId, formId));
+
+    const existingFieldIds = new Set(existingFields.map((field) => field.id));
+
+    if (orderedFieldIds.length !== existingFieldIds.size) {
+      throw new Error("FIELD_LIST_MISMATCH");
+    }
+
+    const allFieldsBelongToForm = orderedFieldIds.every((fieldId) =>
+      existingFieldIds.has(fieldId),
+    );
+
+    if (!allFieldsBelongToForm) {
+      throw new Error("FIELD_LIST_MISMATCH");
+    }
+
     await Promise.all(
       orderedFieldIds.map((fieldId, index) =>
         db

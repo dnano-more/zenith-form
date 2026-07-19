@@ -23,6 +23,13 @@ function handleServiceError(error: unknown): never {
       throw new TRPCError({ code: "NOT_FOUND", message: "Field not found" });
     }
 
+    if (error.message === "FIELD_LIST_MISMATCH") {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "orderedFieldIds must exactly match the fields belonging to this form",
+      });
+    }
+
     if (error.message === "FORBIDDEN") {
       throw new TRPCError({ code: "FORBIDDEN", message: "You do not own this form" });
     }

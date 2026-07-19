@@ -32,4 +32,12 @@ export const authRouter = router({
 
       return { success: true };
     }),
+  logout: publicProcedure
+    .meta({ openapi: { method: "POST", path: getPath("/logout"), tags: TAGS } })
+    .input(zodUndefinedModel)
+    .output(z.object({ success: z.literal(true) }))
+    .mutation(async ({ ctx }) => {
+      ctx.res.clearCookie("session_token");
+      return { success: true };
+    }),
 });
