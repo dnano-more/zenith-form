@@ -5,6 +5,7 @@ import { authRouter } from "./routes/auth/route";
 import { userRouter } from "./routes/user/route";
 import { formRouter } from "./routes/form/route";
 import { fieldRouter } from "./routes/field/route";
+import { responseRouter } from "./routes/response/route";
 
 export const serverRouter = router({
   health: healthRouter,
@@ -12,6 +13,7 @@ export const serverRouter = router({
   user: userRouter,
   form: formRouter,
   field: fieldRouter,
+  response: responseRouter,
 });
 
 export { createContext } from "./context";
