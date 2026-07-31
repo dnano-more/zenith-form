@@ -1,135 +1,120 @@
-# Turborepo starter
+# 🎯 Zenith Form — Typeform-style Form Builder SaaS
 
-This Turborepo starter is maintained by the Turborepo core team.
+> **Portfolio Project** built to demonstrate full-stack software engineering depth, end-to-end type safety, monorepo architecture, and clean security practices.
 
-## Using this example
+---
 
-Run the following command:
+## 🌟 Architecture & Tech Stack
 
-```sh
-npx create-turbo@latest
+Zenith Form is architected as a **pnpm Turborepo Monorepo**:
+
+* **Frontend**: Next.js 16 (App Router), React 19, Tailwind CSS, Lucide Icons, `shadcn/ui` components.
+* **Backend API**: Express.js with `trpc-to-openapi` and `@scalar/express-api-reference`.
+* **API & Data Contracts**: tRPC v11 & Zod validation for 100% end-to-end type safety across client and server.
+* **Database & ORM**: PostgreSQL with Drizzle ORM (using JSONB for dynamic field schemas & answers).
+* **Authentication & Sessions**: Google OAuth 2.0 + Instant Demo Guest Login using HTTP-only JWT cookies.
+* **Security & Privacy**: Strict resource ownership checks, salted SHA-256 IP hashing for rate-limiting, CORS origin isolation.
+
+---
+
+## 📁 Repository Structure
+
+```text
+zenith-form/
+├── apps/
+│   ├── api/             # Express API server (tRPC + OpenAPI endpoints)
+│   └── web/             # Next.js 16 frontend web application
+├── packages/
+│   ├── database/        # Drizzle ORM models, migrations, & seed scripts
+│   ├── logger/          # Shared logging utility
+│   ├── services/        # Decoupled business logic domain services (Form, Field, Response, User)
+│   └── trpc/            # Shared tRPC server routers, procedures & client proxies
+└── docker-compose.yml   # PostgreSQL database container
 ```
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## 🔑 Key Features
 
-### Apps and Packages
+1. **Authentication & Instant Demo Access**:
+   * Google OAuth 2.0 integration with automatic user profile creation.
+   * Instant Guest Demo Login (`demo@zenithform.com`) requiring no credentials.
+   * HTTP-only JWT cookies for secure session management.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+2. **Form & Field CRUD with Ownership Checks**:
+   * Create, update, publish, unpublish, and delete forms.
+   * Add, edit, delete, and reorder questions with strict field-level ownership verification.
+   * Supports 9 field types: `short_text`, `long_text`, `email`, `number`, `single_select`, `multi_select`, `checkbox`, `rating`, `date`.
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+3. **Public Response Submission Engine**:
+   * Distraction-free Typeform-style step-by-step questionnaire UX.
+   * Dynamic per-field validation mirroring backend validation rules.
+   * In-memory rate limiting (5 submissions/min per form/IP).
+   * Salted SHA-256 IP hashing for privacy-first spam protection.
 
-### Utilities
+4. **Analytics & Data Export**:
+   * Real-time submission counter and per-field breakdown.
+   * Option distribution percentages for choice questions & average rating calculations.
+   * One-click CSV export generating downloadable `.csv` files.
 
-This Turborepo has some additional tools already setup for you:
+---
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## 🚀 Quickstart & Installation
 
-### Build
+### 1. Prerequisites
+* Node.js >= 18
+* pnpm 9+
+* Docker Desktop (for local PostgreSQL database)
 
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+### 2. Setup Environment Variables
+Copy `.env.example` to `.env` in the root:
+```bash
+cp .env.example .env
 ```
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+### 3. Start PostgreSQL Database
+```bash
+docker-compose up -d
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+### 4. Install Dependencies
+```bash
+pnpm install
 ```
 
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+### 5. Push Database Schema & Seed Sample Data
+```bash
+pnpm db:migrate
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+### 6. Run Local Development Server
+```bash
+pnpm dev
 ```
 
-## Useful Links
+* **Frontend**: `http://localhost:3000`
+* **Backend API**: `http://localhost:8000`
+* **Interactive Scalar API Docs**: `http://localhost:8000/docs`
 
-Learn more about the power of Turborepo:
+---
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+## 🧪 Demo Credentials
+
+For quick manual testing without configuring Google OAuth keys:
+* Open `http://localhost:3000/login`
+* Click **Instant Demo Access (Guest Login)**
+* Logs in automatically as `demo@zenithform.com` with full creator permissions!
+
+---
+
+## 🔮 Scope Note & Future Improvements
+
+To focus on architectural depth over feature count for job interviews, the following features were deliberately cataloged for future iterations:
+* Password-protected & expiration-limited forms.
+* Conditional branching logic (skip logic).
+* Webhook notifications (Slack/Discord integrations).
+
+---
+
+## 📄 License
+MIT License — Free to use.

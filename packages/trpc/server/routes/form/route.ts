@@ -2,11 +2,12 @@ import { TRPCError } from "@trpc/server";
 import {
   createFormInputSchema,
   formOutputSchema,
+  publicFormOutputSchema,
   updateFormInputSchema,
 } from "@repo/services/form/model";
 import { z } from "../../schema";
 import { formService } from "../../services";
-import { protectedProcedure, router } from "../../trpc";
+import { publicProcedure, protectedProcedure, router } from "../../trpc";
 import { generatePath } from "../../utils/path-generator";
 
 const TAGS = ["Forms"];
@@ -17,7 +18,9 @@ function handleServiceError(error: unknown): never {
     if (error.message === "FORM_NOT_FOUND") {
       throw new TRPCError({ code: "NOT_FOUND", message: "Form not found" });
     }
-
+    if (error.message === "FORM_NOT_PUBLISHED") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This form is not published" });
+    }
     if (error.message === "FORBIDDEN") {
       throw new TRPCError({ code: "FORBIDDEN", message: "You do not own this form" });
     }
@@ -52,6 +55,24 @@ export const formRouter = router({
         handleServiceError(error);
       }
     }),
+
+  getPublicForm: publicProcedure
+    .meta({ openapi: { method: "GET", path: getPath("/public/{formId}"), tags: TAGS } })
+    .input(formIdInputSchema)
+    .output(publicFormOutputSchema)
+    .query(async ({ input }) => {
+      try {
+        return await formService.getPublicForm(input.formId);
+      } catch (error) {
+        handleServiceError(error);
+      }
+    }),
+
+  getExploreForms: publicProcedure
+    .meta({ openapi: { method: "GET", path: getPath("/explore"), tags: TAGS } })
+    .input(z.void())
+    .output(z.array(formOutputSchema))
+    .query(async () => formService.getExploreForms()),
 
   updateForm: protectedProcedure
     .meta({ openapi: { method: "PATCH", path: getPath("/{formId}"), tags: TAGS } })

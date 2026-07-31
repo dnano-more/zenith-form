@@ -1,0 +1,384 @@
+"use client";
+
+import React, { useState } from "react";
+import { useParams } from "next/navigation";
+import { trpc } from "~/trpc/client";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
+import { FormInput, CheckCircle2, ArrowRight, ArrowLeft, Star, Loader2, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+
+export default function PublicFormPage() {
+  const params = useParams();
+  const formId = params.id as string;
+
+  const [answers, setAnswers] = useState<Record<string, unknown>>({});
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Fetch public form details & fields
+  const { data: form, isLoading, isError } = trpc.form.getPublicForm.useQuery({ formId });
+
+  // Submit response mutation
+  const submitMutation = trpc.response.submitResponse.useMutation({
+    onSuccess: () => {
+      setIsSubmitted(true);
+      toast.success("Response submitted successfully!");
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to submit response. Please check your answers.");
+    },
+  });
+
+  const fields = form?.fields ?? [];
+  const currentField = fields[currentStep];
+
+  const handleAnswerChange = (fieldId: string, value: unknown) => {
+    setAnswers((prev) => ({ ...prev, [fieldId]: value }));
+  };
+
+  const handleNext = () => {
+    if (!currentField) return;
+
+    // Validate if current field is required
+    const currentVal = answers[currentField.id];
+    const isMissing =
+      currentVal === undefined ||
+      currentVal === null ||
+      (typeof currentVal === "string" && currentVal.trim() === "") ||
+      (Array.isArray(currentVal) && currentVal.length === 0);
+
+    if (currentField.required && isMissing) {
+      toast.error(`"${currentField.label}" is a required field`);
+      return;
+    }
+
+    if (currentStep < fields.length - 1) {
+      setCurrentStep((prev) => prev + 1);
+    } else {
+      handleSubmit();
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
+  const handleSubmit = () => {
+    // Final check for all required fields
+    for (const f of fields) {
+      const val = answers[f.id];
+      const isMissing =
+        val === undefined ||
+        val === null ||
+        (typeof val === "string" && val.trim() === "") ||
+        (Array.isArray(val) && val.length === 0);
+
+      if (f.required && isMissing) {
+        toast.error(`Please answer required question: "${f.label}"`);
+        return;
+      }
+    }
+
+    submitMutation.mutate({
+      formId,
+      answers,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+        <p className="text-sm font-medium text-muted-foreground">Loading Form...</p>
+      </div>
+    );
+  }
+
+  if (isError || !form) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 text-center">
+        <div className="h-12 w-12 rounded-2xl bg-destructive/10 text-destructive flex items-center justify-center mb-4">
+          <FormInput className="h-6 w-6" />
+        </div>
+        <h1 className="text-2xl font-bold">Form Unavailable</h1>
+        <p className="text-sm text-muted-foreground max-w-md mt-2">
+          This form does not exist, or is currently in draft mode and not accepting public responses.
+        </p>
+      </div>
+    );
+  }
+
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 text-center">
+        <div className="max-w-md w-full border rounded-2xl p-8 bg-card shadow-xl space-y-4">
+          <div className="h-16 w-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
+            <CheckCircle2 className="h-10 w-10" />
+          </div>
+          <h2 className="text-2xl font-extrabold">Thank You!</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Your response has been recorded securely. We appreciate your feedback.
+          </p>
+          <div className="pt-4 border-t text-xs text-muted-foreground flex items-center justify-center gap-1.5">
+            <span>Powered by</span>
+            <span className="font-bold text-foreground">Zenith Form</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (fields.length === 0 || !currentField) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <Card className="max-w-md text-center p-8">
+          <CardTitle>Empty Form</CardTitle>
+          <CardDescription className="mt-2">This form has no questions configured yet.</CardDescription>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col justify-between bg-background font-sans antialiased">
+      {/* Top Header & Progress */}
+      <header className="border-b border-border/40 bg-background/95 backdrop-blur px-6 py-4">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2 font-bold text-base">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <FormInput className="h-3.5 w-3.5" />
+            </div>
+            <span>{form.title}</span>
+          </div>
+
+          <div className="text-xs text-muted-foreground font-medium">
+            Question <span className="text-primary font-bold">{currentStep + 1}</span> of {fields.length}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Single Question Step View */}
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-2xl">
+          {/* Progress Bar */}
+          <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden mb-8">
+            <div
+              className="h-full bg-primary transition-all duration-300 rounded-full"
+              style={{ width: `${((currentStep + 1) / fields.length) * 100}%` }}
+            />
+          </div>
+
+          <Card className="border-border/60 shadow-xl p-6 sm:p-10 space-y-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary text-xs font-bold">
+                  {currentStep + 1}
+                </span>
+                {currentField.required && (
+                  <span className="text-xs font-semibold text-destructive">* Required</span>
+                )}
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{currentField.label}</h2>
+              {currentField.helpText && (
+                <p className="text-sm text-muted-foreground mt-2">{currentField.helpText}</p>
+              )}
+            </div>
+
+            {/* Input Element by Type */}
+            <div className="py-4">
+              {currentField.type === "short_text" && (
+                <Input
+                  type="text"
+                  placeholder={currentField.placeholder || "Type your answer..."}
+                  className="h-12 text-base"
+                  value={(answers[currentField.id] as string) || ""}
+                  onChange={(e) => handleAnswerChange(currentField.id, e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleNext()}
+                  autoFocus
+                />
+              )}
+
+              {currentField.type === "long_text" && (
+                <Textarea
+                  placeholder={currentField.placeholder || "Type your detailed answer..."}
+                  className="text-base min-h-[120px]"
+                  value={(answers[currentField.id] as string) || ""}
+                  onChange={(e) => handleAnswerChange(currentField.id, e.target.value)}
+                  autoFocus
+                />
+              )}
+
+              {currentField.type === "email" && (
+                <Input
+                  type="email"
+                  placeholder={currentField.placeholder || "name@example.com"}
+                  className="h-12 text-base"
+                  value={(answers[currentField.id] as string) || ""}
+                  onChange={(e) => handleAnswerChange(currentField.id, e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleNext()}
+                  autoFocus
+                />
+              )}
+
+              {currentField.type === "number" && (
+                <Input
+                  type="number"
+                  placeholder={currentField.placeholder || "Enter a number..."}
+                  className="h-12 text-base"
+                  value={(answers[currentField.id] as number) ?? ""}
+                  onChange={(e) => handleAnswerChange(currentField.id, e.target.value === "" ? "" : Number(e.target.value))}
+                  onKeyDown={(e) => e.key === "Enter" && handleNext()}
+                  autoFocus
+                />
+              )}
+
+              {currentField.type === "date" && (
+                <Input
+                  type="date"
+                  className="h-12 text-base"
+                  value={(answers[currentField.id] as string) || ""}
+                  onChange={(e) => handleAnswerChange(currentField.id, e.target.value)}
+                  autoFocus
+                />
+              )}
+
+              {currentField.type === "checkbox" && (
+                <div className="flex items-center space-x-3 p-4 border rounded-xl bg-muted/20 cursor-pointer">
+                  <Checkbox
+                    id={currentField.id}
+                    checked={(answers[currentField.id] as boolean) || false}
+                    onCheckedChange={(checked) => handleAnswerChange(currentField.id, !!checked)}
+                  />
+                  <Label htmlFor={currentField.id} className="text-base cursor-pointer">
+                    {currentField.placeholder || "Yes / Agree"}
+                  </Label>
+                </div>
+              )}
+
+              {currentField.type === "rating" && (
+                <div className="flex items-center gap-3">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => handleAnswerChange(currentField.id, star)}
+                      className={`p-3 rounded-2xl border transition-all ${
+                        (answers[currentField.id] as number) >= star
+                          ? "border-amber-400 bg-amber-400/10 text-amber-500 scale-110"
+                          : "border-border text-muted-foreground hover:border-amber-400/50"
+                      }`}
+                    >
+                      <Star className="h-7 w-7 fill-current" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {currentField.type === "single_select" && (
+                <div className="space-y-3">
+                  {(currentField.options ?? []).map((opt, idx) => {
+                    const isSelected = answers[currentField.id] === opt;
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => handleAnswerChange(currentField.id, opt)}
+                        className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer ${
+                          isSelected
+                            ? "border-primary bg-primary/10 font-semibold"
+                            : "border-border hover:border-primary/50 hover:bg-accent/40"
+                        }`}
+                      >
+                        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-muted text-xs font-bold">
+                          {String.fromCharCode(65 + idx)}
+                        </span>
+                        <span className="text-base">{opt}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {currentField.type === "multi_select" && (
+                <div className="space-y-3">
+                  {(currentField.options ?? []).map((opt, idx) => {
+                    const currentArray = (answers[currentField.id] as string[]) || [];
+                    const isSelected = currentArray.includes(opt);
+
+                    const toggleOption = () => {
+                      const updated = isSelected
+                        ? currentArray.filter((o) => o !== opt)
+                        : [...currentArray, opt];
+                      handleAnswerChange(currentField.id, updated);
+                    };
+
+                    return (
+                      <div
+                        key={idx}
+                        onClick={toggleOption}
+                        className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer ${
+                          isSelected
+                            ? "border-primary bg-primary/10 font-semibold"
+                            : "border-border hover:border-primary/50 hover:bg-accent/40"
+                        }`}
+                      >
+                        <Checkbox checked={isSelected} onCheckedChange={toggleOption} />
+                        <span className="text-base">{opt}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Stepper Buttons */}
+            <div className="flex items-center justify-between pt-4 border-t">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePrev}
+                disabled={currentStep === 0}
+                className="gap-1.5"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span>Previous</span>
+              </Button>
+
+              {currentStep < fields.length - 1 ? (
+                <Button size="sm" onClick={handleNext} className="gap-1.5 shadow-sm">
+                  <span>Next Question</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={handleSubmit}
+                  disabled={submitMutation.isPending}
+                  className="gap-1.5 shadow-md bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  {submitMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4" />
+                  )}
+                  <span>Submit Form</span>
+                </Button>
+              )}
+            </div>
+          </Card>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="py-4 text-center text-xs text-muted-foreground border-t border-border/40">
+        <span>Powered by Zenith Form — Interactive Form Builder</span>
+      </footer>
+    </div>
+  );
+}

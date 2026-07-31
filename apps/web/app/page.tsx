@@ -508,7 +508,7 @@ export default async function Home() {
 
           {/* Bottom Copyright & Disclaimer */}
           <div className="border-t border-border/40 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-            <p>© {new Date().getFullYear()} Zenith Form. Portfolio Project for Full-Stack Developer Job Interviews.</p>
+            <p>© {new Date().getFullYear()} Zenith Form. All rights reserved.</p>
             <p className="text-[11px] text-muted-foreground/80">
               Designed & Engineered with Depth Over Feature Count.
             </p>

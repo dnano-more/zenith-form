@@ -31,3 +31,25 @@ export const formOutputSchema = z.object({
   publishedAt: z.date().nullable(),
 });
 export type FormOutput = z.infer<typeof formOutputSchema>;
+
+export const publicFormOutputSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  description: z.string().nullable(),
+  theme: z.string().nullable(),
+  status: z.enum(["draft", "published"]),
+  fields: z.array(
+    z.object({
+      id: z.string().uuid(),
+      type: z.string(),
+      label: z.string(),
+      placeholder: z.string().nullable(),
+      helpText: z.string().nullable(),
+      required: z.boolean(),
+      order: z.number(),
+      options: z.array(z.string()).nullable(),
+      validation: z.record(z.string(), z.unknown()).nullable(),
+    })
+  ),
+});
+export type PublicFormOutput = z.infer<typeof publicFormOutputSchema>;
