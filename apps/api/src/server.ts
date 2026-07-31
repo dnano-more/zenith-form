@@ -59,8 +59,9 @@ app.get("/api/authentication/google/callback", async (req, res) => {
 
     res.cookie("session_token", sessionToken, {
       httpOnly: true,
-      secure: env.NODE_ENV === "prod",
+      secure: env.NODE_ENV === "prod" || env.NODE_ENV === "production",
       sameSite: "lax",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 

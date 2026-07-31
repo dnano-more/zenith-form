@@ -7,6 +7,13 @@ import { generatePath } from "../../utils/path-generator";
 const TAGS = ["Authentication"];
 const getPath = generatePath("/authentication");
 
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: ["prod", "production"].includes(process.env.NODE_ENV ?? ""),
+  sameSite: "lax" as const,
+  path: "/",
+};
+
 export const authRouter = router({
   getSupportedAuthenticationProviders: publicProcedure
     .meta({ openapi: { method: "GET", path: getPath("/supported-providers"), tags: TAGS } })
@@ -24,9 +31,7 @@ export const authRouter = router({
       const { sessionToken } = await userService.loginAsGuest();
 
       ctx.res.cookie("session_token", sessionToken, {
-        httpOnly: true,
-        secure: ["prod", "production"].includes(process.env.NODE_ENV ?? ""),
-        sameSite: "lax",
+        ...COOKIE_OPTIONS,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
@@ -37,7 +42,7 @@ export const authRouter = router({
     .input(zodUndefinedModel)
     .output(z.object({ success: z.literal(true) }))
     .mutation(async ({ ctx }) => {
-      ctx.res.clearCookie("session_token");
+      ctx.res.clearCookie("session_token", COOKIE_OPTIONS);
       return { success: true };
     }),
 });

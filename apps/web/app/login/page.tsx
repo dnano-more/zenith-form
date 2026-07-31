@@ -19,10 +19,13 @@ export default function LoginPage() {
   const { data: providers, isLoading: isProvidersLoading } =
     trpc.auth.getSupportedAuthenticationProviders.useQuery();
 
+  const utils = trpc.useUtils();
+
   // Guest login mutation
   const guestLoginMutation = trpc.auth.loginAsGuest.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Logged in as Guest user");
+      await utils.user.whoAmI.invalidate();
       router.push("/dashboard");
     },
     onError: (err) => {

@@ -27,10 +27,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     retry: false,
   });
 
+  const utils = trpc.useUtils();
+
   // Logout mutation
   const logoutMutation = trpc.auth.logout.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Logged out successfully");
+      utils.user.whoAmI.setData(undefined, null as unknown as { userId: string; email: string });
+      await utils.invalidate();
       router.push("/login");
     },
     onError: (err) => {
