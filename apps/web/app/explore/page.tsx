@@ -23,7 +23,7 @@ export default function ExplorePage() {
           </Badge>
           <h1 className="text-4xl font-extrabold tracking-tight">Explore Community Forms</h1>
           <p className="mt-3 text-muted-foreground text-lg">
-            Discover interactive forms created and published by the Zenith Form community.
+            Discover interactive forms created and published by our community.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export default function ExplorePage() {
       </main>
 
       <footer className="border-t border-border/40 py-8 bg-muted/10 text-xs text-muted-foreground text-center">
-        <p>© {new Date().getFullYear()} Zenith Form. Portfolio Project for Full-Stack Developer Job Interviews.</p>
+        <p>© {new Date().getFullYear()} Zenith Form. All rights reserved.</p>
       </footer>
     </div>
   );
