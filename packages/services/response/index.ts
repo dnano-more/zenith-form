@@ -201,8 +201,8 @@ class ResponseService {
         };
       }
 
-      // numeric & rating fields
-      if (type === "number" || type === "rating") {
+      // rating field (1-5 star metrics)
+      if (type === "rating") {
         let sum = 0;
         let valCount = 0;
         let min = Infinity;
@@ -210,7 +210,7 @@ class ResponseService {
 
         for (const resp of responses) {
           const answer = resp.answers[field.id];
-          if (answer !== undefined && answer !== null) {
+          if (answer !== undefined && answer !== null && answer !== "") {
             const num = Number(answer);
             if (!Number.isNaN(num)) {
               sum += num;
@@ -234,12 +234,16 @@ class ResponseService {
         };
       }
 
-      // text, email, date fields
+      // number, text, email, date fields
       let answeredCount = 0;
+      const recentAnswers: string[] = [];
       for (const resp of responses) {
         const answer = resp.answers[field.id];
         if (answer !== undefined && answer !== null && answer !== "") {
           answeredCount++;
+          if (recentAnswers.length < 3) {
+            recentAnswers.push(String(answer));
+          }
         }
       }
 
@@ -247,7 +251,7 @@ class ResponseService {
         fieldId: field.id,
         label: field.label,
         type,
-        stats: { answeredCount },
+        stats: { answeredCount, recentAnswers },
       };
     });
 

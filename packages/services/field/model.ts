@@ -26,6 +26,7 @@ export type AddFieldInput = z.infer<typeof addFieldInputSchema>;
 
 export const updateFieldInputSchema = z.object({
   fieldId: z.string().uuid(),
+  type: fieldTypeSchema.optional(),
   label: z.string().min(1).max(255).optional(),
   placeholder: z.string().max(255).optional(),
   helpText: z.string().max(500).optional(),

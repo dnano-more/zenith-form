@@ -38,6 +38,7 @@ import {
   Hash,
   Mail,
   Sparkles,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -69,6 +70,16 @@ export default function FormBuilderPage() {
   const [required, setRequired] = useState(false);
   const [optionsText, setOptionsText] = useState("");
 
+  // Edit Field State
+  const [editingField, setEditingField] = useState<NonNullable<typeof fields>[number] | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editFieldType, setEditFieldType] = useState<FieldTypeEnum>("short_text");
+  const [editLabel, setEditLabel] = useState("");
+  const [editPlaceholder, setEditPlaceholder] = useState("");
+  const [editHelpText, setEditHelpText] = useState("");
+  const [editRequired, setEditRequired] = useState(false);
+  const [editOptionsText, setEditOptionsText] = useState("");
+
   // Queries
   const { data: form, isLoading: isFormLoading } = trpc.form.getFormById.useQuery({ formId });
   const { data: fields, isLoading: isFieldsLoading } = trpc.field.getFieldsByForm.useQuery({ formId });
@@ -82,6 +93,17 @@ export default function FormBuilderPage() {
       utils.field.getFieldsByForm.invalidate({ formId });
     },
     onError: (err) => toast.error(err.message || "Failed to add field"),
+  });
+
+  // Update Field Mutation
+  const updateFieldMutation = trpc.field.updateField.useMutation({
+    onSuccess: () => {
+      toast.success("Field updated successfully!");
+      setIsEditOpen(false);
+      setEditingField(null);
+      utils.field.getFieldsByForm.invalidate({ formId });
+    },
+    onError: (err) => toast.error(err.message || "Failed to update field"),
   });
 
   // Delete Field Mutation
@@ -156,6 +178,52 @@ export default function FormBuilderPage() {
       placeholder: placeholder.trim() || undefined,
       helpText: helpText.trim() || undefined,
       required,
+      options,
+    });
+  };
+
+  const openEditDialog = (f: NonNullable<typeof fields>[number]) => {
+    setEditingField(f);
+    setEditFieldType(f.type as FieldTypeEnum);
+    setEditLabel(f.label);
+    setEditPlaceholder(f.placeholder || "");
+    setEditHelpText(f.helpText || "");
+    setEditRequired(f.required);
+    setEditOptionsText(f.options ? f.options.join("\n") : "");
+    setIsEditOpen(true);
+  };
+
+  const handleUpdateField = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingField) return;
+    if (!editLabel.trim()) {
+      toast.error("Field label is required");
+      return;
+    }
+
+    const options =
+      editFieldType === "single_select" || editFieldType === "multi_select"
+        ? editOptionsText
+            .split("\n")
+            .map((o) => o.trim())
+            .filter(Boolean)
+        : undefined;
+
+    if (
+      (editFieldType === "single_select" || editFieldType === "multi_select") &&
+      (!options || options.length === 0)
+    ) {
+      toast.error("Choice fields must have at least one option");
+      return;
+    }
+
+    updateFieldMutation.mutate({
+      fieldId: editingField.id,
+      type: editFieldType,
+      label: editLabel.trim(),
+      placeholder: editPlaceholder.trim() || undefined,
+      helpText: editHelpText.trim() || undefined,
+      required: editRequired,
       options,
     });
   };
@@ -366,6 +434,104 @@ export default function FormBuilderPage() {
                 </form>
               </DialogContent>
             </Dialog>
+
+            {/* Edit Field Modal */}
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+              <DialogContent className="sm:max-w-md">
+                <form onSubmit={handleUpdateField}>
+                  <DialogHeader>
+                    <DialogTitle>Edit Form Field</DialogTitle>
+                    <DialogDescription>
+                      Modify field attributes like question text, field type, placeholder, options, and mandatory rules.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-4 py-4">
+                    {/* Field Type Select */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold uppercase text-muted-foreground">Field Type *</label>
+                      <Select value={editFieldType} onValueChange={(val) => setEditFieldType(val as FieldTypeEnum)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select field type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FIELD_TYPES.map((t) => (
+                            <SelectItem key={t.value} value={t.value}>
+                              <div className="flex items-center gap-2">
+                                <t.icon className="h-4 w-4 text-primary" />
+                                <span>{t.label}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Field Label */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold uppercase text-muted-foreground">Label (Question Text) *</label>
+                      <Input
+                        placeholder="e.g. What is your full name?"
+                        value={editLabel}
+                        onChange={(e) => setEditLabel(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    {/* Placeholder */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold uppercase text-muted-foreground">Placeholder (Optional)</label>
+                      <Input
+                        placeholder="e.g. Type your response here..."
+                        value={editPlaceholder}
+                        onChange={(e) => setEditPlaceholder(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Help Text */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold uppercase text-muted-foreground">Help Text (Optional)</label>
+                      <Input
+                        placeholder="e.g. We will never share your details."
+                        value={editHelpText}
+                        onChange={(e) => setEditHelpText(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Options list for choice fields */}
+                    {(editFieldType === "single_select" || editFieldType === "multi_select") && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold uppercase text-muted-foreground">
+                          Options (One option per line) *
+                        </label>
+                        <Textarea
+                          placeholder={`Option 1\nOption 2\nOption 3`}
+                          value={editOptionsText}
+                          onChange={(e) => setEditOptionsText(e.target.value)}
+                          rows={4}
+                        />
+                      </div>
+                    )}
+
+                    {/* Required Switch */}
+                    <div className="flex items-center justify-between pt-2">
+                      <label className="text-xs font-semibold uppercase text-muted-foreground">Mandatory / Required Field</label>
+                      <Switch checked={editRequired} onCheckedChange={setEditRequired} />
+                    </div>
+                  </div>
+
+                  <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={updateFieldMutation.isPending}>
+                      {updateFieldMutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                      Save Changes
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* Fields Render List */}
@@ -405,6 +571,17 @@ export default function FormBuilderPage() {
                     </div>
 
                     <div className="flex items-center gap-1">
+                      {/* Edit */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                        onClick={() => openEditDialog(f)}
+                        title="Edit Field"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+
                       {/* Move Up */}
                       <Button
                         variant="ghost"
@@ -412,6 +589,7 @@ export default function FormBuilderPage() {
                         className="h-7 w-7"
                         disabled={idx === 0 || reorderMutation.isPending}
                         onClick={() => handleMoveField(idx, "up")}
+                        title="Move Up"
                       >
                         <MoveUp className="h-3.5 w-3.5" />
                       </Button>
@@ -423,6 +601,7 @@ export default function FormBuilderPage() {
                         className="h-7 w-7"
                         disabled={idx === fields.length - 1 || reorderMutation.isPending}
                         onClick={() => handleMoveField(idx, "down")}
+                        title="Move Down"
                       >
                         <MoveDown className="h-3.5 w-3.5" />
                       </Button>
@@ -437,6 +616,7 @@ export default function FormBuilderPage() {
                             deleteFieldMutation.mutate({ fieldId: f.id });
                           }
                         }}
+                        title="Delete Field"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>

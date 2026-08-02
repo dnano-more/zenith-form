@@ -62,6 +62,7 @@ export const getFormAnalyticsOutputSchema = z.object({
         }),
         z.object({
           answeredCount: z.number(),
+          recentAnswers: z.array(z.string()).optional(),
         }),
       ]),
     })

@@ -83,6 +83,7 @@ class FieldService {
     const [updated] = await db
       .update(formFieldsTable)
       .set({
+        ...(input.type !== undefined && { type: input.type }),
         ...(input.label !== undefined && { label: input.label }),
         ...(input.placeholder !== undefined && { placeholder: input.placeholder }),
         ...(input.helpText !== undefined && { helpText: input.helpText }),
