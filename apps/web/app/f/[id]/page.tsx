@@ -13,6 +13,18 @@ import { FormInput, CheckCircle2, ArrowRight, ArrowLeft, Star, Loader2, Sparkles
 import { toast } from "sonner";
 import { getFormTheme } from "~/lib/themes";
 
+type FieldValidationRules = {
+  htmlType?: "text" | "tel" | "email" | "url" | "password" | "number";
+  min?: number;
+  max?: number;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  errorMessage?: string;
+  allowCountryCode?: boolean;
+  defaultCountry?: string;
+};
+
 export default function PublicFormPage() {
   const params = useParams();
   const formId = params.id as string;
@@ -38,6 +50,7 @@ export default function PublicFormPage() {
   const fields = form?.fields ?? [];
   const currentField = fields[currentStep];
   const themeConfig = getFormTheme(form?.theme);
+  const fieldValidation = (currentField?.validation ?? {}) as FieldValidationRules;
 
   const handleAnswerChange = (fieldId: string, value: unknown) => {
     setAnswers((prev) => ({ ...prev, [fieldId]: value }));
@@ -59,6 +72,19 @@ export default function PublicFormPage() {
       return;
     }
 
+    // Client-side regex & length validation if configured
+    if (fieldValidation.pattern && typeof currentVal === "string" && currentVal.trim() !== "") {
+      try {
+        const reg = new RegExp(fieldValidation.pattern);
+        if (!reg.test(currentVal.trim())) {
+          toast.error(fieldValidation.errorMessage || `Invalid format for "${currentField.label}"`);
+          return;
+        }
+      } catch {
+        // ignore invalid regex syntax
+      }
+    }
+
     if (currentStep < fields.length - 1) {
       setCurrentStep((prev) => prev + 1);
     } else {
@@ -73,9 +99,10 @@ export default function PublicFormPage() {
   };
 
   const handleSubmit = () => {
-    // Final check for all required fields
+    // Final check for all required fields & regex rules
     for (const f of fields) {
       const val = answers[f.id];
+      const fVal = (f.validation ?? {}) as FieldValidationRules;
       const isMissing =
         val === undefined ||
         val === null ||
@@ -85,6 +112,18 @@ export default function PublicFormPage() {
       if (f.required && isMissing) {
         toast.error(`Please answer required question: "${f.label}"`);
         return;
+      }
+
+      if (fVal.pattern && typeof val === "string" && val.trim() !== "") {
+        try {
+          const reg = new RegExp(fVal.pattern);
+          if (!reg.test(val.trim())) {
+            toast.error(fVal.errorMessage || `Invalid format for question: "${f.label}"`);
+            return;
+          }
+        } catch {
+          // ignore
+        }
       }
     }
 
@@ -197,7 +236,7 @@ export default function PublicFormPage() {
             <div className="py-4">
               {currentField.type === "short_text" && (
                 <Input
-                  type="text"
+                  type={fieldValidation.htmlType || "text"}
                   placeholder={currentField.placeholder || "Type your answer..."}
                   className={`h-12 text-base ${themeConfig.inputClass}`}
                   value={(answers[currentField.id] as string) || ""}
@@ -219,8 +258,20 @@ export default function PublicFormPage() {
 
               {currentField.type === "email" && (
                 <Input
-                  type="email"
+                  type={fieldValidation.htmlType || "email"}
                   placeholder={currentField.placeholder || "name@example.com"}
+                  className={`h-12 text-base ${themeConfig.inputClass}`}
+                  value={(answers[currentField.id] as string) || ""}
+                  onChange={(e) => handleAnswerChange(currentField.id, e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleNext()}
+                  autoFocus
+                />
+              )}
+
+              {currentField.type === "phone" && (
+                <Input
+                  type={fieldValidation.htmlType || "tel"}
+                  placeholder={currentField.placeholder || "+1 (555) 000-0000"}
                   className={`h-12 text-base ${themeConfig.inputClass}`}
                   value={(answers[currentField.id] as string) || ""}
                   onChange={(e) => handleAnswerChange(currentField.id, e.target.value)}
@@ -231,7 +282,7 @@ export default function PublicFormPage() {
 
               {currentField.type === "number" && (
                 <Input
-                  type="number"
+                  type={fieldValidation.htmlType || "number"}
                   placeholder={currentField.placeholder || "Enter a number..."}
                   className={`h-12 text-base ${themeConfig.inputClass}`}
                   value={(answers[currentField.id] as number) ?? ""}

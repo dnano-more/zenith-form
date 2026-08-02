@@ -11,6 +11,7 @@ import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Switch } from "~/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "~/components/ui/collapsible";
 import {
   Dialog,
   DialogContent,
@@ -37,9 +38,13 @@ import {
   Calendar,
   Hash,
   Mail,
+  Phone,
   Sparkles,
   Pencil,
   Palette,
+  ShieldCheck,
+  ChevronDown,
+  Settings2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { FORM_THEMES, getFormTheme } from "~/lib/themes";
@@ -48,6 +53,7 @@ const FIELD_TYPES = [
   { value: "short_text", label: "Short Text", icon: Type },
   { value: "long_text", label: "Long Text (Paragraph)", icon: Type },
   { value: "email", label: "Email Address", icon: Mail },
+  { value: "phone", label: "Phone Number", icon: Phone },
   { value: "number", label: "Number", icon: Hash },
   { value: "single_select", label: "Single Select (Radio)", icon: List },
   { value: "multi_select", label: "Multi Select (Checkboxes)", icon: List },
@@ -58,6 +64,14 @@ const FIELD_TYPES = [
 
 type FieldTypeEnum = (typeof FIELD_TYPES)[number]["value"];
 
+// Helper conditional flags for clean non-tech UI
+const isTextType = (t: FieldTypeEnum) => t === "short_text" || t === "long_text" || t === "email";
+const isPhoneType = (t: FieldTypeEnum) => t === "phone";
+const isNumberType = (t: FieldTypeEnum) => t === "number";
+const isChoiceType = (t: FieldTypeEnum) => t === "single_select" || t === "multi_select";
+const showPlaceholder = (t: FieldTypeEnum) => isTextType(t) || isPhoneType(t) || isNumberType(t);
+const showAdvancedValidation = (t: FieldTypeEnum) => isTextType(t) || isPhoneType(t) || isNumberType(t);
+
 export default function FormBuilderPage() {
   const params = useParams();
   const formId = params.id as string;
@@ -65,6 +79,7 @@ export default function FormBuilderPage() {
   const utils = trpc.useUtils();
 
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddAdvancedOpen, setIsAddAdvancedOpen] = useState(false);
   const [fieldType, setFieldType] = useState<FieldTypeEnum>("short_text");
   const [label, setLabel] = useState("");
   const [placeholder, setPlaceholder] = useState("");
@@ -72,15 +87,34 @@ export default function FormBuilderPage() {
   const [required, setRequired] = useState(false);
   const [optionsText, setOptionsText] = useState("");
 
+  // Validation Rules State for Add Field
+  const [pattern, setPattern] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [minLength, setMinLength] = useState("");
+  const [maxLength, setMaxLength] = useState("");
+  const [minVal, setMinVal] = useState("");
+  const [maxVal, setMaxVal] = useState("");
+  const [htmlType, setHtmlType] = useState<"text" | "tel" | "email" | "url" | "password" | "number" | "">("");
+
   // Edit Field State
   const [editingField, setEditingField] = useState<NonNullable<typeof fields>[number] | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isEditAdvancedOpen, setIsEditAdvancedOpen] = useState(false);
   const [editFieldType, setEditFieldType] = useState<FieldTypeEnum>("short_text");
   const [editLabel, setEditLabel] = useState("");
   const [editPlaceholder, setEditPlaceholder] = useState("");
   const [editHelpText, setEditHelpText] = useState("");
   const [editRequired, setEditRequired] = useState(false);
   const [editOptionsText, setEditOptionsText] = useState("");
+
+  // Edit Field Validation Rules State
+  const [editPattern, setEditPattern] = useState("");
+  const [editErrorMessage, setEditErrorMessage] = useState("");
+  const [editMinLength, setEditMinLength] = useState("");
+  const [editMaxLength, setEditMaxLength] = useState("");
+  const [editMinVal, setEditMinVal] = useState("");
+  const [editMaxVal, setEditMaxVal] = useState("");
+  const [editHtmlType, setEditHtmlType] = useState<"text" | "tel" | "email" | "url" | "password" | "number" | "">("");
 
   // Queries
   const { data: form, isLoading: isFormLoading } = trpc.form.getFormById.useQuery({ formId });
@@ -157,6 +191,14 @@ export default function FormBuilderPage() {
     setHelpText("");
     setRequired(false);
     setOptionsText("");
+    setPattern("");
+    setErrorMessage("");
+    setMinLength("");
+    setMaxLength("");
+    setMinVal("");
+    setMaxVal("");
+    setHtmlType("");
+    setIsAddAdvancedOpen(false);
   };
 
   const handleAddField = (e: React.FormEvent) => {
@@ -166,41 +208,67 @@ export default function FormBuilderPage() {
       return;
     }
 
-    const options =
-      fieldType === "single_select" || fieldType === "multi_select"
-        ? optionsText
-            .split("\n")
-            .map((o) => o.trim())
-            .filter(Boolean)
-        : undefined;
+    const options = isChoiceType(fieldType)
+      ? optionsText
+          .split("\n")
+          .map((o) => o.trim())
+          .filter(Boolean)
+      : undefined;
 
-    if (
-      (fieldType === "single_select" || fieldType === "multi_select") &&
-      (!options || options.length === 0)
-    ) {
+    if (isChoiceType(fieldType) && (!options || options.length === 0)) {
       toast.error("Choice fields must have at least one option");
       return;
     }
+
+    const validation = showAdvancedValidation(fieldType)
+      ? {
+          pattern: (isTextType(fieldType) || isPhoneType(fieldType)) && pattern.trim() ? pattern.trim() : undefined,
+          errorMessage: errorMessage.trim() || undefined,
+          minLength: (isTextType(fieldType) || isPhoneType(fieldType)) && minLength ? Number(minLength) : undefined,
+          maxLength: (isTextType(fieldType) || isPhoneType(fieldType)) && maxLength ? Number(maxLength) : undefined,
+          min: isNumberType(fieldType) && minVal ? Number(minVal) : undefined,
+          max: isNumberType(fieldType) && maxVal ? Number(maxVal) : undefined,
+          htmlType: htmlType ? (htmlType as "text" | "tel" | "email" | "url" | "password" | "number") : undefined,
+        }
+      : undefined;
 
     addFieldMutation.mutate({
       formId,
       type: fieldType,
       label: label.trim(),
-      placeholder: placeholder.trim() || undefined,
+      placeholder: showPlaceholder(fieldType) ? (placeholder.trim() || undefined) : undefined,
       helpText: helpText.trim() || undefined,
       required,
       options,
+      validation: validation && Object.keys(validation).some((k) => validation[k as keyof typeof validation] !== undefined)
+        ? validation
+        : undefined,
     });
   };
 
   const openEditDialog = (f: NonNullable<typeof fields>[number]) => {
     setEditingField(f);
-    setEditFieldType(f.type as FieldTypeEnum);
+    const fType = f.type as FieldTypeEnum;
+    setEditFieldType(fType);
     setEditLabel(f.label);
     setEditPlaceholder(f.placeholder || "");
     setEditHelpText(f.helpText || "");
     setEditRequired(f.required);
     setEditOptionsText(f.options ? f.options.join("\n") : "");
+
+    const v = f.validation || {};
+    setEditPattern(v.pattern || "");
+    setEditErrorMessage(v.errorMessage || "");
+    setEditMinLength(v.minLength !== undefined ? String(v.minLength) : "");
+    setEditMaxLength(v.maxLength !== undefined ? String(v.maxLength) : "");
+    setEditMinVal(v.min !== undefined ? String(v.min) : "");
+    setEditMaxVal(v.max !== undefined ? String(v.max) : "");
+    setEditHtmlType((v.htmlType as "text" | "tel" | "email" | "url" | "password" | "number") || "");
+
+    // Expand accordion if field already has validation rules configured
+    const hasExistingAdvanced = !!(v.pattern || v.errorMessage || v.minLength || v.maxLength || v.min || v.max || v.htmlType);
+    setIsEditAdvancedOpen(hasExistingAdvanced);
+
     setIsEditOpen(true);
   };
 
@@ -212,30 +280,41 @@ export default function FormBuilderPage() {
       return;
     }
 
-    const options =
-      editFieldType === "single_select" || editFieldType === "multi_select"
-        ? editOptionsText
-            .split("\n")
-            .map((o) => o.trim())
-            .filter(Boolean)
-        : undefined;
+    const options = isChoiceType(editFieldType)
+      ? editOptionsText
+          .split("\n")
+          .map((o) => o.trim())
+          .filter(Boolean)
+      : undefined;
 
-    if (
-      (editFieldType === "single_select" || editFieldType === "multi_select") &&
-      (!options || options.length === 0)
-    ) {
+    if (isChoiceType(editFieldType) && (!options || options.length === 0)) {
       toast.error("Choice fields must have at least one option");
       return;
     }
+
+    const validation = showAdvancedValidation(editFieldType)
+      ? {
+          pattern: (isTextType(editFieldType) || isPhoneType(editFieldType)) && editPattern.trim() ? editPattern.trim() : undefined,
+          errorMessage: editErrorMessage.trim() || undefined,
+          minLength: (isTextType(editFieldType) || isPhoneType(editFieldType)) && editMinLength ? Number(editMinLength) : undefined,
+          maxLength: (isTextType(editFieldType) || isPhoneType(editFieldType)) && editMaxLength ? Number(editMaxLength) : undefined,
+          min: isNumberType(editFieldType) && editMinVal ? Number(editMinVal) : undefined,
+          max: isNumberType(editFieldType) && editMaxVal ? Number(editMaxVal) : undefined,
+          htmlType: editHtmlType ? (editHtmlType as "text" | "tel" | "email" | "url" | "password" | "number") : undefined,
+        }
+      : undefined;
 
     updateFieldMutation.mutate({
       fieldId: editingField.id,
       type: editFieldType,
       label: editLabel.trim(),
-      placeholder: editPlaceholder.trim() || undefined,
+      placeholder: showPlaceholder(editFieldType) ? (editPlaceholder.trim() || undefined) : undefined,
       helpText: editHelpText.trim() || undefined,
       required: editRequired,
       options,
+      validation: validation && Object.keys(validation).some((k) => validation[k as keyof typeof validation] !== undefined)
+        ? validation
+        : undefined,
     });
   };
 
@@ -350,12 +429,12 @@ export default function FormBuilderPage() {
                   <span>Add New Field</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
                 <form onSubmit={handleAddField}>
                   <DialogHeader>
                     <DialogTitle>Add Form Field</DialogTitle>
                     <DialogDescription>
-                      Configure a new field to add to your interactive form.
+                      Configure a new question field for your form.
                     </DialogDescription>
                   </DialogHeader>
 
@@ -384,38 +463,40 @@ export default function FormBuilderPage() {
                     <div className="space-y-2">
                       <label className="text-xs font-semibold uppercase text-muted-foreground">Label (Question Text) *</label>
                       <Input
-                        placeholder="e.g. What is your full name?"
+                        placeholder="e.g. What is your full phone number?"
                         value={label}
                         onChange={(e) => setLabel(e.target.value)}
                         required
                       />
                     </div>
 
-                    {/* Placeholder */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold uppercase text-muted-foreground">Placeholder (Optional)</label>
-                      <Input
-                        placeholder="e.g. Type your response here..."
-                        value={placeholder}
-                        onChange={(e) => setPlaceholder(e.target.value)}
-                      />
-                    </div>
+                    {/* Placeholder (Hidden for checkbox, rating, date, select) */}
+                    {showPlaceholder(fieldType) && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold uppercase text-muted-foreground">Placeholder (Optional)</label>
+                        <Input
+                          placeholder={fieldType === "phone" ? "+1 (555) 000-0000" : "e.g. Type your response here..."}
+                          value={placeholder}
+                          onChange={(e) => setPlaceholder(e.target.value)}
+                        />
+                      </div>
+                    )}
 
                     {/* Help Text */}
                     <div className="space-y-2">
                       <label className="text-xs font-semibold uppercase text-muted-foreground">Help Text (Optional)</label>
                       <Input
-                        placeholder="e.g. We will never share your details."
+                        placeholder="e.g. Additional instructions for respondents."
                         value={helpText}
                         onChange={(e) => setHelpText(e.target.value)}
                       />
                     </div>
 
-                    {/* Options list for choice fields */}
-                    {(fieldType === "single_select" || fieldType === "multi_select") && (
-                      <div className="space-y-2">
+                    {/* Options Manager (ONLY for single_select & multi_select) */}
+                    {isChoiceType(fieldType) && (
+                      <div className="space-y-2 border-t pt-3">
                         <label className="text-xs font-semibold uppercase text-muted-foreground">
-                          Options (One option per line) *
+                          Options List (One option per line) *
                         </label>
                         <Textarea
                           placeholder={`Option 1\nOption 2\nOption 3`}
@@ -426,8 +507,152 @@ export default function FormBuilderPage() {
                       </div>
                     )}
 
+                    {/* Preset Length Rules for Phone */}
+                    {isPhoneType(fieldType) && (
+                      <div className="border rounded-xl p-3 bg-muted/10 space-y-2">
+                        <span className="text-[11px] font-bold text-muted-foreground uppercase">Preset Phone Length Rules</span>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <label className="text-[11px] font-medium text-muted-foreground">Min Digits</label>
+                            <Input
+                              type="number"
+                              placeholder="10"
+                              className="h-8 text-xs"
+                              value={minLength}
+                              onChange={(e) => setMinLength(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[11px] font-medium text-muted-foreground">Max Digits</label>
+                            <Input
+                              type="number"
+                              placeholder="15"
+                              className="h-8 text-xs"
+                              value={maxLength}
+                              onChange={(e) => setMaxLength(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Collapsible Advanced Validation & Limits (CLOSED by default) */}
+                    {showAdvancedValidation(fieldType) && (
+                      <Collapsible open={isAddAdvancedOpen} onOpenChange={setIsAddAdvancedOpen} className="border rounded-xl p-3 bg-muted/20 space-y-3">
+                        <CollapsibleTrigger asChild>
+                          <button
+                            type="button"
+                            className="flex items-center justify-between w-full text-xs font-bold text-foreground hover:text-primary transition-colors cursor-pointer"
+                          >
+                            <div className="flex items-center gap-1.5">
+                              <Settings2 className="h-4 w-4 text-primary" />
+                              <span>⚙️ Advanced Validation & Limits (Optional)</span>
+                            </div>
+                            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isAddAdvancedOpen ? "rotate-180" : ""}`} />
+                          </button>
+                        </CollapsibleTrigger>
+
+                        <CollapsibleContent className="space-y-3 pt-2 border-t border-border/40">
+                          {(isTextType(fieldType) || isPhoneType(fieldType)) && (
+                            <div className="space-y-3">
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                  <label className="text-[11px] font-medium text-muted-foreground">Validation Format / Rule</label>
+                                  <Input
+                                    placeholder="e.g. ^[0-9]{10}$"
+                                    className="h-8 text-xs font-mono"
+                                    value={pattern}
+                                    onChange={(e) => setPattern(e.target.value)}
+                                  />
+                                </div>
+
+                                <div className="space-y-1">
+                                  <label className="text-[11px] font-medium text-muted-foreground">Error Message for Invalid Input</label>
+                                  <Input
+                                    placeholder="e.g. Please enter a valid number"
+                                    className="h-8 text-xs"
+                                    value={errorMessage}
+                                    onChange={(e) => setErrorMessage(e.target.value)}
+                                  />
+                                </div>
+
+                                {!isPhoneType(fieldType) && (
+                                  <>
+                                    <div className="space-y-1">
+                                      <label className="text-[11px] font-medium text-muted-foreground">Min Length</label>
+                                      <Input
+                                        type="number"
+                                        placeholder="e.g. 5"
+                                        className="h-8 text-xs"
+                                        value={minLength}
+                                        onChange={(e) => setMinLength(e.target.value)}
+                                      />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                      <label className="text-[11px] font-medium text-muted-foreground">Max Length</label>
+                                      <Input
+                                        type="number"
+                                        placeholder="e.g. 100"
+                                        className="h-8 text-xs"
+                                        value={maxLength}
+                                        onChange={(e) => setMaxLength(e.target.value)}
+                                      />
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {isNumberType(fieldType) && (
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1">
+                                <label className="text-[11px] font-medium text-muted-foreground">Min Value</label>
+                                <Input
+                                  type="number"
+                                  placeholder="e.g. 0"
+                                  className="h-8 text-xs"
+                                  value={minVal}
+                                  onChange={(e) => setMinVal(e.target.value)}
+                                />
+                              </div>
+
+                              <div className="space-y-1">
+                                <label className="text-[11px] font-medium text-muted-foreground">Max Value</label>
+                                <Input
+                                  type="number"
+                                  placeholder="e.g. 100"
+                                  className="h-8 text-xs"
+                                  value={maxVal}
+                                  onChange={(e) => setMaxVal(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="space-y-1">
+                            <label className="text-[11px] font-medium text-muted-foreground">HTML Input Type Override</label>
+                            <Select value={htmlType} onValueChange={(v) => setHtmlType(v as typeof htmlType)}>
+                              <SelectTrigger className="h-8 text-xs">
+                                <SelectValue placeholder="Default for category" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="text">text (Standard Text)</SelectItem>
+                                <SelectItem value="tel">tel (Telephone Input)</SelectItem>
+                                <SelectItem value="email">email (Email Address)</SelectItem>
+                                <SelectItem value="url">url (Web URL)</SelectItem>
+                                <SelectItem value="number">number (Numeric Only)</SelectItem>
+                                <SelectItem value="password">password (Hidden Mask)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    )}
+
                     {/* Required Switch */}
-                    <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-center justify-between pt-2 border-t">
                       <label className="text-xs font-semibold uppercase text-muted-foreground">Mandatory / Required Field</label>
                       <Switch checked={required} onCheckedChange={setRequired} />
                     </div>
@@ -448,12 +673,12 @@ export default function FormBuilderPage() {
 
             {/* Edit Field Modal */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
                 <form onSubmit={handleUpdateField}>
                   <DialogHeader>
                     <DialogTitle>Edit Form Field</DialogTitle>
                     <DialogDescription>
-                      Modify field attributes like question text, field type, placeholder, options, and mandatory rules.
+                      Modify field attributes dynamically.
                     </DialogDescription>
                   </DialogHeader>
 
@@ -482,38 +707,40 @@ export default function FormBuilderPage() {
                     <div className="space-y-2">
                       <label className="text-xs font-semibold uppercase text-muted-foreground">Label (Question Text) *</label>
                       <Input
-                        placeholder="e.g. What is your full name?"
+                        placeholder="e.g. What is your full phone number?"
                         value={editLabel}
                         onChange={(e) => setEditLabel(e.target.value)}
                         required
                       />
                     </div>
 
-                    {/* Placeholder */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold uppercase text-muted-foreground">Placeholder (Optional)</label>
-                      <Input
-                        placeholder="e.g. Type your response here..."
-                        value={editPlaceholder}
-                        onChange={(e) => setEditPlaceholder(e.target.value)}
-                      />
-                    </div>
+                    {/* Placeholder (Hidden for checkbox, rating, date, select) */}
+                    {showPlaceholder(editFieldType) && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold uppercase text-muted-foreground">Placeholder (Optional)</label>
+                        <Input
+                          placeholder={editFieldType === "phone" ? "+1 (555) 000-0000" : "e.g. Type your response here..."}
+                          value={editPlaceholder}
+                          onChange={(e) => setEditPlaceholder(e.target.value)}
+                        />
+                      </div>
+                    )}
 
                     {/* Help Text */}
                     <div className="space-y-2">
                       <label className="text-xs font-semibold uppercase text-muted-foreground">Help Text (Optional)</label>
                       <Input
-                        placeholder="e.g. We will never share your details."
+                        placeholder="e.g. Additional instructions for respondents."
                         value={editHelpText}
                         onChange={(e) => setEditHelpText(e.target.value)}
                       />
                     </div>
 
-                    {/* Options list for choice fields */}
-                    {(editFieldType === "single_select" || editFieldType === "multi_select") && (
-                      <div className="space-y-2">
+                    {/* Options Manager (ONLY for single_select & multi_select) */}
+                    {isChoiceType(editFieldType) && (
+                      <div className="space-y-2 border-t pt-3">
                         <label className="text-xs font-semibold uppercase text-muted-foreground">
-                          Options (One option per line) *
+                          Options List (One option per line) *
                         </label>
                         <Textarea
                           placeholder={`Option 1\nOption 2\nOption 3`}
@@ -524,8 +751,152 @@ export default function FormBuilderPage() {
                       </div>
                     )}
 
+                    {/* Preset Length Rules for Phone */}
+                    {isPhoneType(editFieldType) && (
+                      <div className="border rounded-xl p-3 bg-muted/10 space-y-2">
+                        <span className="text-[11px] font-bold text-muted-foreground uppercase">Preset Phone Length Rules</span>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <label className="text-[11px] font-medium text-muted-foreground">Min Digits</label>
+                            <Input
+                              type="number"
+                              placeholder="10"
+                              className="h-8 text-xs"
+                              value={editMinLength}
+                              onChange={(e) => setEditMinLength(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[11px] font-medium text-muted-foreground">Max Digits</label>
+                            <Input
+                              type="number"
+                              placeholder="15"
+                              className="h-8 text-xs"
+                              value={editMaxLength}
+                              onChange={(e) => setEditMaxLength(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Collapsible Advanced Validation & Limits (CLOSED by default) */}
+                    {showAdvancedValidation(editFieldType) && (
+                      <Collapsible open={isEditAdvancedOpen} onOpenChange={setIsEditAdvancedOpen} className="border rounded-xl p-3 bg-muted/20 space-y-3">
+                        <CollapsibleTrigger asChild>
+                          <button
+                            type="button"
+                            className="flex items-center justify-between w-full text-xs font-bold text-foreground hover:text-primary transition-colors cursor-pointer"
+                          >
+                            <div className="flex items-center gap-1.5">
+                              <Settings2 className="h-4 w-4 text-primary" />
+                              <span>⚙️ Advanced Validation & Limits (Optional)</span>
+                            </div>
+                            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isEditAdvancedOpen ? "rotate-180" : ""}`} />
+                          </button>
+                        </CollapsibleTrigger>
+
+                        <CollapsibleContent className="space-y-3 pt-2 border-t border-border/40">
+                          {(isTextType(editFieldType) || isPhoneType(editFieldType)) && (
+                            <div className="space-y-3">
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                  <label className="text-[11px] font-medium text-muted-foreground">Validation Format / Rule</label>
+                                  <Input
+                                    placeholder="e.g. ^[0-9]{10}$"
+                                    className="h-8 text-xs font-mono"
+                                    value={editPattern}
+                                    onChange={(e) => setEditPattern(e.target.value)}
+                                  />
+                                </div>
+
+                                <div className="space-y-1">
+                                  <label className="text-[11px] font-medium text-muted-foreground">Error Message for Invalid Input</label>
+                                  <Input
+                                    placeholder="e.g. Please enter a valid number"
+                                    className="h-8 text-xs"
+                                    value={editErrorMessage}
+                                    onChange={(e) => setEditErrorMessage(e.target.value)}
+                                  />
+                                </div>
+
+                                {!isPhoneType(editFieldType) && (
+                                  <>
+                                    <div className="space-y-1">
+                                      <label className="text-[11px] font-medium text-muted-foreground">Min Length</label>
+                                      <Input
+                                        type="number"
+                                        placeholder="e.g. 5"
+                                        className="h-8 text-xs"
+                                        value={editMinLength}
+                                        onChange={(e) => setEditMinLength(e.target.value)}
+                                      />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                      <label className="text-[11px] font-medium text-muted-foreground">Max Length</label>
+                                      <Input
+                                        type="number"
+                                        placeholder="e.g. 100"
+                                        className="h-8 text-xs"
+                                        value={editMaxLength}
+                                        onChange={(e) => setEditMaxLength(e.target.value)}
+                                      />
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {isNumberType(editFieldType) && (
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1">
+                                <label className="text-[11px] font-medium text-muted-foreground">Min Value</label>
+                                <Input
+                                  type="number"
+                                  placeholder="e.g. 0"
+                                  className="h-8 text-xs"
+                                  value={editMinVal}
+                                  onChange={(e) => setEditMinVal(e.target.value)}
+                                />
+                              </div>
+
+                              <div className="space-y-1">
+                                <label className="text-[11px] font-medium text-muted-foreground">Max Value</label>
+                                <Input
+                                  type="number"
+                                  placeholder="e.g. 100"
+                                  className="h-8 text-xs"
+                                  value={editMaxVal}
+                                  onChange={(e) => setEditMaxVal(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="space-y-1">
+                            <label className="text-[11px] font-medium text-muted-foreground">HTML Input Type Override</label>
+                            <Select value={editHtmlType} onValueChange={(v) => setEditHtmlType(v as typeof editHtmlType)}>
+                              <SelectTrigger className="h-8 text-xs">
+                                <SelectValue placeholder="Default for category" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="text">text (Standard Text)</SelectItem>
+                                <SelectItem value="tel">tel (Telephone Input)</SelectItem>
+                                <SelectItem value="email">email (Email Address)</SelectItem>
+                                <SelectItem value="url">url (Web URL)</SelectItem>
+                                <SelectItem value="number">number (Numeric Only)</SelectItem>
+                                <SelectItem value="password">password (Hidden Mask)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    )}
+
                     {/* Required Switch */}
-                    <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-center justify-between pt-2 border-t">
                       <label className="text-xs font-semibold uppercase text-muted-foreground">Mandatory / Required Field</label>
                       <Switch checked={editRequired} onCheckedChange={setEditRequired} />
                     </div>
@@ -574,9 +945,14 @@ export default function FormBuilderPage() {
                         <div className="flex items-center gap-2">
                           <h4 className="text-sm font-semibold">{f.label}</h4>
                           {f.required && <Badge variant="destructive" className="text-[9px] px-1.5 py-0">Required</Badge>}
+                          {f.validation?.pattern && (
+                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 font-mono bg-primary/10 text-primary border-primary/20">
+                              Validation Rule
+                            </Badge>
+                          )}
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5 capitalize">
-                          Type: {f.type.replace("_", " ")}
+                          Type: {f.type.replace("_", " ")} {f.validation?.htmlType ? `(${f.validation.htmlType})` : ""}
                         </p>
                       </div>
                     </div>

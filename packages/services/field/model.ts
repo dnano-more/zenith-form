@@ -5,12 +5,26 @@ export const fieldTypeSchema = z.enum([
   "long_text",
   "email",
   "number",
+  "phone",
   "single_select",
   "multi_select",
   "checkbox",
   "rating",
   "date",
 ]);
+
+export const fieldValidationRulesSchema = z.object({
+  htmlType: z.enum(["text", "tel", "email", "url", "password", "number"]).optional(),
+  min: z.number().optional(),
+  max: z.number().optional(),
+  minLength: z.number().optional(),
+  maxLength: z.number().optional(),
+  pattern: z.string().optional(),
+  errorMessage: z.string().optional(),
+  allowCountryCode: z.boolean().optional(),
+  defaultCountry: z.string().optional(),
+});
+export type FieldValidationRules = z.infer<typeof fieldValidationRulesSchema>;
 
 export const addFieldInputSchema = z.object({
   formId: z.string().uuid(),
@@ -19,8 +33,8 @@ export const addFieldInputSchema = z.object({
   placeholder: z.string().max(255).optional(),
   helpText: z.string().max(500).optional(),
   required: z.boolean().default(false),
-  options: z.array(z.string()).optional(), // select/multi-select/checkbox ke liye
-  validation: z.record(z.string(), z.unknown()).optional(),
+  options: z.array(z.string()).optional(),
+  validation: fieldValidationRulesSchema.optional(),
 });
 export type AddFieldInput = z.infer<typeof addFieldInputSchema>;
 
@@ -32,7 +46,7 @@ export const updateFieldInputSchema = z.object({
   helpText: z.string().max(500).optional(),
   required: z.boolean().optional(),
   options: z.array(z.string()).optional(),
-  validation: z.record(z.string(), z.unknown()).optional(),
+  validation: fieldValidationRulesSchema.optional(),
 });
 export type UpdateFieldInput = z.infer<typeof updateFieldInputSchema>;
 
@@ -52,6 +66,6 @@ export const fieldOutputSchema = z.object({
   required: z.boolean(),
   order: z.number(),
   options: z.array(z.string()).nullable(),
-  validation: z.record(z.string(), z.unknown()).nullable(),
+  validation: fieldValidationRulesSchema.nullable(),
 });
 export type FieldOutput = z.infer<typeof fieldOutputSchema>;
