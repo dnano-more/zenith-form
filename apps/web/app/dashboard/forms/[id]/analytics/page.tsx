@@ -339,13 +339,32 @@ export default function FormAnalyticsPage() {
                       </div>
                     )}
 
-                    {/* Text / Email Fields */}
+                    {/* Text / Number / Email / Date Fields */}
                     {"answeredCount" in item.stats && (
-                      <div className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border text-xs">
-                        <span className="text-muted-foreground">Answered Submissions:</span>
-                        <span className="font-bold text-foreground">
-                          {(item.stats as { answeredCount: number }).answeredCount} / {analytics.totalResponses}
-                        </span>
+                      <div className="space-y-2.5">
+                        <div className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border text-xs">
+                          <span className="text-muted-foreground">Answered Submissions:</span>
+                          <span className="font-bold text-foreground">
+                            {(item.stats as { answeredCount: number }).answeredCount} / {analytics.totalResponses}
+                          </span>
+                        </div>
+
+                        {"recentAnswers" in item.stats &&
+                          Array.isArray((item.stats as { recentAnswers?: string[] }).recentAnswers) &&
+                          ((item.stats as { recentAnswers: string[] }).recentAnswers.length > 0) && (
+                            <div className="space-y-1">
+                              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                Recent Entries Preview
+                              </span>
+                              <div className="flex flex-wrap gap-1.5 pt-0.5">
+                                {(item.stats as { recentAnswers: string[] }).recentAnswers.map((ans, idx) => (
+                                  <Badge key={idx} variant="secondary" className="text-xs font-mono py-1 px-2.5">
+                                    {ans}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                       </div>
                     )}
                   </CardContent>
