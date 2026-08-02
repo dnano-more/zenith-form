@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { trpc } from "~/trpc/client";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
@@ -19,6 +20,13 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import {
   Plus,
   Edit3,
   BarChart3,
@@ -26,20 +34,29 @@ import {
   Trash2,
   Globe,
   Lock,
-  Sparkles,
   Loader2,
   FileText,
   Palette,
+  MoreVertical,
+  Search,
+  Copy,
+  MessageSquare,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { FORM_THEMES, getFormTheme } from "~/lib/themes";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const utils = trpc.useUtils();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedTheme, setSelectedTheme] = useState("default");
+
+  // Dashboard Toolbar Filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
 
   // Query user's forms
   const { data: forms, isLoading } = trpc.form.getMyForms.useQuery();
@@ -99,6 +116,22 @@ export default function DashboardPage() {
       visibility: "public",
     });
   };
+
+  const handleCopyPublicLink = (e: React.MouseEvent, formId: string) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/f/${formId}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Public form link copied to clipboard!");
+  };
+
+  // Filtered forms list
+  const filteredForms = (forms ?? []).filter((f) => {
+    const matchesSearch =
+      f.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (f.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
+    const matchesStatus = statusFilter === "all" ? true : f.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div className="space-y-8">
@@ -183,6 +216,35 @@ export default function DashboardPage() {
         </Dialog>
       </div>
 
+      {/* Dashboard Toolbar: Search & Filter */}
+      {forms && forms.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-muted/20 p-3 rounded-2xl border">
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Filter forms by title..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 bg-background h-9 text-xs"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <span className="text-xs font-medium text-muted-foreground">Status:</span>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}>
+              <SelectTrigger className="w-[140px] h-9 text-xs bg-background">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Forms</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="draft">Drafts</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
       {/* Forms Grid */}
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
@@ -203,109 +265,159 @@ export default function DashboardPage() {
             <span>Create Your First Form</span>
           </Button>
         </div>
+      ) : filteredForms.length === 0 ? (
+        <div className="py-12 text-center border rounded-2xl bg-card">
+          <p className="text-sm font-medium text-muted-foreground">No forms match your search/filter criteria.</p>
+          <Button variant="link" onClick={() => { setSearchQuery(""); setStatusFilter("all"); }} className="text-xs mt-1">
+            Reset filters
+          </Button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {forms.map((form) => (
-            <Card key={form.id} className="flex flex-col justify-between border-border/60 hover:border-primary/40 transition-all shadow-sm">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-1.5">
-                    <Badge
-                      variant={form.status === "published" ? "default" : "secondary"}
-                      className="capitalize text-[11px]"
-                    >
-                      {form.status}
-                    </Badge>
-                    <Badge variant="outline" className="text-[10px] bg-muted/40 font-normal">
-                      {getFormTheme(form.theme).name}
-                    </Badge>
+          {filteredForms.map((form) => {
+            const responseCount = form.responseCount ?? 0;
+            return (
+              <Card
+                key={form.id}
+                className="group flex flex-col justify-between border-border/60 hover:border-primary/50 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                onClick={() => router.push(`/dashboard/forms/${form.id}`)}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    {/* Status & Response Badges */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <Badge
+                        variant={form.status === "published" ? "default" : "secondary"}
+                        className="capitalize text-[11px]"
+                      >
+                        {form.status}
+                      </Badge>
+
+                      {/* Response Counter Badge */}
+                      <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20 gap-1 font-semibold">
+                        <MessageSquare className="h-3 w-3" />
+                        <span>{responseCount} {responseCount === 1 ? "response" : "responses"}</span>
+                      </Badge>
+                    </div>
+
+                    {/* Top Right More Options Dropdown */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-44 text-xs">
+                        {form.status === "published" ? (
+                          <>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(`/f/${form.id}`, "_blank");
+                              }}
+                              className="gap-2 cursor-pointer"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5 text-primary" />
+                              <span>View Public Form</span>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onClick={(e) => handleCopyPublicLink(e, form.id)}
+                              className="gap-2 cursor-pointer"
+                            >
+                              <Copy className="h-3.5 w-3.5" />
+                              <span>Copy Public Link</span>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                unpublishMutation.mutate({ formId: form.id });
+                              }}
+                              className="gap-2 text-amber-500 cursor-pointer"
+                            >
+                              <Lock className="h-3.5 w-3.5" />
+                              <span>Unpublish Form</span>
+                            </DropdownMenuItem>
+                          </>
+                        ) : (
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              publishMutation.mutate({ formId: form.id });
+                            }}
+                            className="gap-2 text-emerald-500 font-semibold cursor-pointer"
+                          >
+                            <Globe className="h-3.5 w-3.5" />
+                            <span>Publish Form</span>
+                          </DropdownMenuItem>
+                        )}
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm("Are you sure you want to delete this form?")) {
+                              deleteMutation.mutate({ formId: form.id });
+                            }
+                          }}
+                          className="gap-2 text-destructive focus:bg-destructive/10 cursor-pointer"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          <span>Delete Form</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    {form.visibility === "public" ? (
-                      <Globe className="h-3.5 w-3.5 text-blue-500" />
-                    ) : (
-                      <Lock className="h-3.5 w-3.5" />
-                    )}
-                    <span className="capitalize">{form.visibility}</span>
-                  </div>
-                </div>
+                  <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors line-clamp-1">
+                    {form.title}
+                  </CardTitle>
 
-                <CardTitle className="text-lg font-bold line-clamp-1">{form.title}</CardTitle>
-                <CardDescription className="text-xs line-clamp-2 min-h-[32px] mt-1">
-                  {form.description || "No description provided"}
-                </CardDescription>
-              </CardHeader>
+                  <CardDescription className="text-xs line-clamp-2 min-h-[32px] mt-1">
+                    {form.description || "No description provided"}
+                  </CardDescription>
+                </CardHeader>
 
-              <CardContent className="py-2 text-xs text-muted-foreground border-t border-b bg-muted/20 flex justify-between items-center">
-                <span>Created {new Date(form.createdAt ?? Date.now()).toLocaleDateString()}</span>
-                <span className="font-mono text-[11px] bg-background px-2 py-0.5 rounded border">
-                  /{form.slug}
-                </span>
-              </CardContent>
+                <CardContent className="py-2.5 text-xs text-muted-foreground border-t border-b bg-muted/20 flex justify-between items-center">
+                  <span className="text-[11px]">
+                    Created {new Date(form.createdAt ?? Date.now()).toLocaleDateString()}
+                  </span>
 
-              <CardFooter className="pt-4 flex flex-wrap gap-2 justify-between">
-                <div className="flex items-center gap-1">
-                  <Link href={`/dashboard/forms/${form.id}`}>
-                    <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
-                      <Edit3 className="h-3.5 w-3.5" />
-                      <span>Fields & Theme</span>
+                  {/* Click to Copy Public Link Slug Badge */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleCopyPublicLink(e, form.id)}
+                    className="font-mono text-[11px] bg-background hover:bg-accent px-2 py-0.5 rounded border transition-colors flex items-center gap-1 group/slug"
+                    title="Click to copy public link"
+                  >
+                    <span>/{form.slug}</span>
+                    <Copy className="h-3 w-3 text-muted-foreground group-hover/slug:text-primary transition-colors" />
+                  </button>
+                </CardContent>
+
+                {/* Primary Card Bottom Actions: Edit Form & Analytics */}
+                <CardFooter className="pt-3 pb-3 flex items-center justify-between gap-2">
+                  <Link href={`/dashboard/forms/${form.id}`} onClick={(e) => e.stopPropagation()} className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full h-8 text-xs gap-1.5 font-medium">
+                      <Edit3 className="h-3.5 w-3.5 text-primary" />
+                      <span>Edit Form</span>
                     </Button>
                   </Link>
 
-                  <Link href={`/dashboard/forms/${form.id}/analytics`}>
-                    <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                  <Link href={`/dashboard/forms/${form.id}/analytics`} onClick={(e) => e.stopPropagation()} className="flex-1">
+                    <Button variant="secondary" size="sm" className="w-full h-8 text-xs gap-1.5 font-medium">
                       <BarChart3 className="h-3.5 w-3.5" />
                       <span>Analytics</span>
                     </Button>
                   </Link>
-
-                  {form.status === "published" && (
-                    <Link href={`/f/${form.id}`} target="_blank">
-                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
-                        <ExternalLink className="h-3.5 w-3.5 text-primary" />
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-1">
-                  {form.status === "published" ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 text-xs text-amber-500 hover:text-amber-600"
-                      onClick={() => unpublishMutation.mutate({ formId: form.id })}
-                    >
-                      Unpublish
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 text-xs text-emerald-500 hover:text-emerald-600 font-medium"
-                      onClick={() => publishMutation.mutate({ formId: form.id })}
-                    >
-                      Publish
-                    </Button>
-                  )}
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 px-2 text-xs text-destructive hover:bg-destructive/10"
-                    onClick={() => {
-                      if (confirm("Are you sure you want to delete this form?")) {
-                        deleteMutation.mutate({ formId: form.id });
-                      }
-                    }}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </CardFooter>
-            </Card>
-          ))}
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

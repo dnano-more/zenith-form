@@ -29,6 +29,7 @@ export const formOutputSchema = z.object({
   createdAt: z.date().nullable(),
   updatedAt: z.date().nullable(),
   publishedAt: z.date().nullable(),
+  responseCount: z.number().optional().default(0),
 });
 export type FormOutput = z.infer<typeof formOutputSchema>;
 
@@ -52,4 +53,4 @@ export const publicFormOutputSchema = z.object({
     })
   ),
 });
-export type PublicFormOutput = z.infer<typeof publicFormOutputSchema>;
+export type PublicFormOutput = z.infer<typeof publicFormOutputSchema>;

@@ -121,4 +121,16 @@ export const formRouter = router({
         handleServiceError(error);
       }
     }),
+
+  seedSampleForms: protectedProcedure
+    .meta({ openapi: { method: "POST", path: getPath("/seed-sample"), tags: TAGS } })
+    .input(z.void())
+    .output(z.object({ success: z.literal(true) }))
+    .mutation(async ({ ctx }) => {
+      try {
+        return await formService.seedSampleForms(ctx.user.userId);
+      } catch (error) {
+        handleServiceError(error);
+      }
+    }),
 });
