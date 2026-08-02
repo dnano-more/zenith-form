@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "~/components/ui/badge";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -28,25 +29,29 @@ import {
   Sparkles,
   Loader2,
   FileText,
+  Palette,
 } from "lucide-react";
 import { toast } from "sonner";
+import { FORM_THEMES, getFormTheme } from "~/lib/themes";
 
 export default function DashboardPage() {
   const utils = trpc.useUtils();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [selectedTheme, setSelectedTheme] = useState("default");
 
   // Query user's forms
   const { data: forms, isLoading } = trpc.form.getMyForms.useQuery();
 
   // Create form mutation
   const createFormMutation = trpc.form.createForm.useMutation({
-    onSuccess: (newForm) => {
+    onSuccess: () => {
       toast.success("Form created successfully!");
       setIsCreateOpen(false);
       setTitle("");
       setDescription("");
+      setSelectedTheme("default");
       utils.form.getMyForms.invalidate();
     },
     onError: (err) => {
@@ -90,6 +95,7 @@ export default function DashboardPage() {
     createFormMutation.mutate({
       title: title.trim(),
       description: description.trim() || undefined,
+      theme: selectedTheme,
       visibility: "public",
     });
   };
@@ -101,7 +107,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">My Forms</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Create, manage fields, and monitor real-time submissions for your forms
+            Create, manage fields, customize themes, and monitor real-time submissions for your forms
           </p>
         </div>
 
@@ -118,7 +124,7 @@ export default function DashboardPage() {
               <DialogHeader>
                 <DialogTitle>Create New Form</DialogTitle>
                 <DialogDescription>
-                  Set a title and optional description for your new interactive form.
+                  Set a title, description, and visual theme for your interactive form.
                 </DialogDescription>
               </DialogHeader>
 
@@ -141,6 +147,25 @@ export default function DashboardPage() {
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase text-muted-foreground">Visual Theme *</label>
+                  <Select value={selectedTheme} onValueChange={setSelectedTheme}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select visual theme" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(FORM_THEMES).map((t) => (
+                        <SelectItem key={t.id} value={t.id}>
+                          <div className="flex items-center gap-2">
+                            <Palette className="h-3.5 w-3.5 text-primary" />
+                            <span>{t.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -171,7 +196,7 @@ export default function DashboardPage() {
           </div>
           <h3 className="text-lg font-bold">No forms created yet</h3>
           <p className="text-sm text-muted-foreground max-w-sm mt-1 mb-6">
-            Get started by creating your first interactive Typeform-style form in seconds.
+            Get started by creating your first interactive form in seconds.
           </p>
           <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
             <Plus className="h-4 w-4" />
@@ -184,12 +209,17 @@ export default function DashboardPage() {
             <Card key={form.id} className="flex flex-col justify-between border-border/60 hover:border-primary/40 transition-all shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <Badge
-                    variant={form.status === "published" ? "default" : "secondary"}
-                    className="capitalize text-[11px]"
-                  >
-                    {form.status}
-                  </Badge>
+                  <div className="flex items-center gap-1.5">
+                    <Badge
+                      variant={form.status === "published" ? "default" : "secondary"}
+                      className="capitalize text-[11px]"
+                    >
+                      {form.status}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px] bg-muted/40 font-normal">
+                      {getFormTheme(form.theme).name}
+                    </Badge>
+                  </div>
 
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     {form.visibility === "public" ? (
@@ -219,7 +249,7 @@ export default function DashboardPage() {
                   <Link href={`/dashboard/forms/${form.id}`}>
                     <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
                       <Edit3 className="h-3.5 w-3.5" />
-                      <span>Fields</span>
+                      <span>Fields & Theme</span>
                     </Button>
                   </Link>
 

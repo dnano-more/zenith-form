@@ -11,6 +11,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { FormInput, CheckCircle2, ArrowRight, ArrowLeft, Star, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { getFormTheme } from "~/lib/themes";
 
 export default function PublicFormPage() {
   const params = useParams();
@@ -36,6 +37,7 @@ export default function PublicFormPage() {
 
   const fields = form?.fields ?? [];
   const currentField = fields[currentStep];
+  const themeConfig = getFormTheme(form?.theme);
 
   const handleAnswerChange = (fieldId: string, value: unknown) => {
     setAnswers((prev) => ({ ...prev, [fieldId]: value }));
@@ -117,18 +119,18 @@ export default function PublicFormPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 text-center">
-        <div className="max-w-md w-full border rounded-2xl p-8 bg-card shadow-xl space-y-4">
+      <div className={`min-h-screen flex flex-col items-center justify-center px-4 text-center ${themeConfig.bgClass}`}>
+        <div className={`max-w-md w-full rounded-2xl p-8 shadow-2xl space-y-4 ${themeConfig.cardClass}`}>
           <div className="h-16 w-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
             <CheckCircle2 className="h-10 w-10" />
           </div>
           <h2 className="text-2xl font-extrabold">Thank You!</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className={`text-sm leading-relaxed ${themeConfig.subtextClass}`}>
             Your response has been recorded securely. We appreciate your feedback.
           </p>
-          <div className="pt-4 border-t text-xs text-muted-foreground flex items-center justify-center gap-1.5">
+          <div className={`pt-4 border-t border-border/40 text-xs flex items-center justify-center gap-1.5 ${themeConfig.subtextClass}`}>
             <span>Powered by</span>
-            <span className="font-bold text-foreground">Zenith Form</span>
+            <span className="font-bold">Zenith Form</span>
           </div>
         </div>
       </div>
@@ -137,29 +139,29 @@ export default function PublicFormPage() {
 
   if (fields.length === 0 || !currentField) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card className="max-w-md text-center p-8">
+      <div className={`min-h-screen flex items-center justify-center px-4 ${themeConfig.bgClass}`}>
+        <Card className={`max-w-md text-center p-8 ${themeConfig.cardClass}`}>
           <CardTitle>Empty Form</CardTitle>
-          <CardDescription className="mt-2">This form has no questions configured yet.</CardDescription>
+          <CardDescription className={`mt-2 ${themeConfig.subtextClass}`}>This form has no questions configured yet.</CardDescription>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-background font-sans antialiased">
+    <div className={`min-h-screen flex flex-col justify-between font-sans antialiased transition-colors duration-500 ${themeConfig.bgClass}`}>
       {/* Top Header & Progress */}
-      <header className="border-b border-border/40 bg-background/95 backdrop-blur px-6 py-4">
+      <header className={`px-6 py-4 ${themeConfig.headerClass}`}>
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-base">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${themeConfig.primaryButtonClass}`}>
               <FormInput className="h-3.5 w-3.5" />
             </div>
-            <span>{form.title}</span>
+            <span className={themeConfig.textClass}>{form.title}</span>
           </div>
 
-          <div className="text-xs text-muted-foreground font-medium">
-            Question <span className="text-primary font-bold">{currentStep + 1}</span> of {fields.length}
+          <div className={`text-xs font-medium ${themeConfig.subtextClass}`}>
+            Question <span className={`font-bold ${themeConfig.accentTextClass}`}>{currentStep + 1}</span> of {fields.length}
           </div>
         </div>
       </header>
@@ -168,26 +170,26 @@ export default function PublicFormPage() {
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-2xl">
           {/* Progress Bar */}
-          <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden mb-8">
+          <div className={`h-1.5 w-full rounded-full overflow-hidden mb-8 ${themeConfig.progressBg}`}>
             <div
-              className="h-full bg-primary transition-all duration-300 rounded-full"
+              className={`h-full transition-all duration-300 rounded-full ${themeConfig.progressFill}`}
               style={{ width: `${((currentStep + 1) / fields.length) * 100}%` }}
             />
           </div>
 
-          <Card className="border-border/60 shadow-xl p-6 sm:p-10 space-y-6">
+          <Card className={`p-6 sm:p-10 space-y-6 ${themeConfig.cardClass}`}>
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary text-xs font-bold">
+                <span className={`flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold ${themeConfig.badgeBg}`}>
                   {currentStep + 1}
                 </span>
                 {currentField.required && (
-                  <span className="text-xs font-semibold text-destructive">* Required</span>
+                  <span className="text-xs font-semibold text-rose-500">* Required</span>
                 )}
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{currentField.label}</h2>
               {currentField.helpText && (
-                <p className="text-sm text-muted-foreground mt-2">{currentField.helpText}</p>
+                <p className={`text-sm mt-2 ${themeConfig.subtextClass}`}>{currentField.helpText}</p>
               )}
             </div>
 
@@ -197,7 +199,7 @@ export default function PublicFormPage() {
                 <Input
                   type="text"
                   placeholder={currentField.placeholder || "Type your answer..."}
-                  className="h-12 text-base"
+                  className={`h-12 text-base ${themeConfig.inputClass}`}
                   value={(answers[currentField.id] as string) || ""}
                   onChange={(e) => handleAnswerChange(currentField.id, e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleNext()}
@@ -208,7 +210,7 @@ export default function PublicFormPage() {
               {currentField.type === "long_text" && (
                 <Textarea
                   placeholder={currentField.placeholder || "Type your detailed answer..."}
-                  className="text-base min-h-[120px]"
+                  className={`text-base min-h-[120px] ${themeConfig.inputClass}`}
                   value={(answers[currentField.id] as string) || ""}
                   onChange={(e) => handleAnswerChange(currentField.id, e.target.value)}
                   autoFocus
@@ -219,7 +221,7 @@ export default function PublicFormPage() {
                 <Input
                   type="email"
                   placeholder={currentField.placeholder || "name@example.com"}
-                  className="h-12 text-base"
+                  className={`h-12 text-base ${themeConfig.inputClass}`}
                   value={(answers[currentField.id] as string) || ""}
                   onChange={(e) => handleAnswerChange(currentField.id, e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleNext()}
@@ -231,7 +233,7 @@ export default function PublicFormPage() {
                 <Input
                   type="number"
                   placeholder={currentField.placeholder || "Enter a number..."}
-                  className="h-12 text-base"
+                  className={`h-12 text-base ${themeConfig.inputClass}`}
                   value={(answers[currentField.id] as number) ?? ""}
                   onChange={(e) => handleAnswerChange(currentField.id, e.target.value === "" ? "" : Number(e.target.value))}
                   onKeyDown={(e) => e.key === "Enter" && handleNext()}
@@ -242,7 +244,7 @@ export default function PublicFormPage() {
               {currentField.type === "date" && (
                 <Input
                   type="date"
-                  className="h-12 text-base"
+                  className={`h-12 text-base ${themeConfig.inputClass}`}
                   value={(answers[currentField.id] as string) || ""}
                   onChange={(e) => handleAnswerChange(currentField.id, e.target.value)}
                   autoFocus
@@ -250,7 +252,7 @@ export default function PublicFormPage() {
               )}
 
               {currentField.type === "checkbox" && (
-                <div className="flex items-center space-x-3 p-4 border rounded-xl bg-muted/20 cursor-pointer">
+                <div className={`flex items-center space-x-3 p-4 rounded-xl cursor-pointer border transition-all ${themeConfig.optionClass}`}>
                   <Checkbox
                     id={currentField.id}
                     checked={(answers[currentField.id] as boolean) || false}
@@ -269,10 +271,10 @@ export default function PublicFormPage() {
                       key={star}
                       type="button"
                       onClick={() => handleAnswerChange(currentField.id, star)}
-                      className={`p-3 rounded-2xl border transition-all ${
+                      className={`p-3.5 rounded-2xl border transition-all ${
                         (answers[currentField.id] as number) >= star
-                          ? "border-amber-400 bg-amber-400/10 text-amber-500 scale-110"
-                          : "border-border text-muted-foreground hover:border-amber-400/50"
+                          ? "border-amber-400 bg-amber-400/20 text-amber-400 scale-110 shadow-lg shadow-amber-400/20"
+                          : `${themeConfig.optionClass}`
                       }`}
                     >
                       <Star className="h-7 w-7 fill-current" />
@@ -291,11 +293,11 @@ export default function PublicFormPage() {
                         onClick={() => handleAnswerChange(currentField.id, opt)}
                         className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer ${
                           isSelected
-                            ? "border-primary bg-primary/10 font-semibold"
-                            : "border-border hover:border-primary/50 hover:bg-accent/40"
+                            ? themeConfig.optionSelectedClass
+                            : themeConfig.optionClass
                         }`}
                       >
-                        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-muted text-xs font-bold">
+                        <span className={`flex h-6 w-6 items-center justify-center rounded-lg text-xs font-bold ${themeConfig.badgeBg}`}>
                           {String.fromCharCode(65 + idx)}
                         </span>
                         <span className="text-base">{opt}</span>
@@ -324,8 +326,8 @@ export default function PublicFormPage() {
                         onClick={toggleOption}
                         className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer ${
                           isSelected
-                            ? "border-primary bg-primary/10 font-semibold"
-                            : "border-border hover:border-primary/50 hover:bg-accent/40"
+                            ? themeConfig.optionSelectedClass
+                            : themeConfig.optionClass
                         }`}
                       >
                         <Checkbox checked={isSelected} onCheckedChange={toggleOption} />
@@ -338,7 +340,7 @@ export default function PublicFormPage() {
             </div>
 
             {/* Bottom Stepper Buttons */}
-            <div className="flex items-center justify-between pt-4 border-t">
+            <div className="flex items-center justify-between pt-4 border-t border-border/40">
               <Button
                 variant="ghost"
                 size="sm"
@@ -351,7 +353,7 @@ export default function PublicFormPage() {
               </Button>
 
               {currentStep < fields.length - 1 ? (
-                <Button size="sm" onClick={handleNext} className="gap-1.5 shadow-sm">
+                <Button size="sm" onClick={handleNext} className={`gap-1.5 ${themeConfig.primaryButtonClass}`}>
                   <span>Next Question</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -360,7 +362,7 @@ export default function PublicFormPage() {
                   size="sm"
                   onClick={handleSubmit}
                   disabled={submitMutation.isPending}
-                  className="gap-1.5 shadow-md bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="gap-1.5 shadow-md bg-emerald-600 hover:bg-emerald-500 text-white"
                 >
                   {submitMutation.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -376,7 +378,7 @@ export default function PublicFormPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center text-xs text-muted-foreground border-t border-border/40">
+      <footer className={`py-4 text-center text-xs border-t border-border/40 ${themeConfig.subtextClass}`}>
         <span>Powered by Zenith Form — Interactive Form Builder</span>
       </footer>
     </div>

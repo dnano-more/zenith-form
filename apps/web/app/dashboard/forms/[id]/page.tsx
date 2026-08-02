@@ -39,8 +39,10 @@ import {
   Mail,
   Sparkles,
   Pencil,
+  Palette,
 } from "lucide-react";
 import { toast } from "sonner";
+import { FORM_THEMES, getFormTheme } from "~/lib/themes";
 
 const FIELD_TYPES = [
   { value: "short_text", label: "Short Text", icon: Type },
@@ -83,6 +85,15 @@ export default function FormBuilderPage() {
   // Queries
   const { data: form, isLoading: isFormLoading } = trpc.form.getFormById.useQuery({ formId });
   const { data: fields, isLoading: isFieldsLoading } = trpc.field.getFieldsByForm.useQuery({ formId });
+
+  // Update Form Theme Mutation
+  const updateFormMutation = trpc.form.updateForm.useMutation({
+    onSuccess: () => {
+      toast.success("Form visual theme updated!");
+      utils.form.getFormById.invalidate({ formId });
+    },
+    onError: (err) => toast.error(err.message || "Failed to update theme"),
+  });
 
   // Add Field Mutation
   const addFieldMutation = trpc.field.addField.useMutation({
@@ -641,10 +652,68 @@ export default function FormBuilderPage() {
           )}
         </div>
 
-        {/* Right Column: Form Settings Summary */}
+        {/* Right Column: Form Settings & Visual Theme Selector */}
         <div className="space-y-4">
           <Card className="border-border/60 shadow-sm">
-            <CardHeader>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-bold flex items-center gap-2">
+                <Palette className="h-4 w-4 text-primary" />
+                <span>Form Visual Theme</span>
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Select visual styling for your public form preview & responses.
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-3 text-xs">
+              <div className="grid grid-cols-1 gap-2.5">
+                {Object.values(FORM_THEMES).map((t) => {
+                  const isSelected = (form.theme || "default") === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => updateFormMutation.mutate({ formId: form.id, theme: t.id })}
+                      className={`group relative text-left p-3 rounded-xl border transition-all duration-200 ${
+                        isSelected
+                          ? "border-primary bg-primary/10 ring-2 ring-primary shadow-md"
+                          : "border-border/60 hover:border-primary/50 hover:bg-accent/40"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Mini Visual Swatch Box */}
+                        <div className={`h-10 w-14 rounded-lg bg-gradient-to-br ${t.swatchBg} p-1 border shadow-inner flex flex-col justify-between overflow-hidden shrink-0`}>
+                          <div className={`h-2.5 w-full rounded ${t.swatchCard} flex items-center justify-end px-0.5`}>
+                            <div className={`h-1.5 w-1.5 rounded-full ${t.swatchAccent}`} />
+                          </div>
+                          <div className="h-1 w-2/3 rounded bg-white/40" />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">
+                              {t.name}
+                            </span>
+                            {isSelected && (
+                              <Badge variant="default" className="text-[9px] px-1.5 py-0 bg-primary text-primary-foreground font-bold">
+                                Active
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">
+                            {t.description}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="pb-3">
               <CardTitle className="text-base font-bold">Form Info</CardTitle>
               <CardDescription className="text-xs">Summary configuration</CardDescription>
             </CardHeader>
@@ -666,8 +735,8 @@ export default function FormBuilderPage() {
               </div>
 
               <div>
-                <span className="text-muted-foreground uppercase font-semibold text-[10px]">Theme</span>
-                <p className="font-medium mt-0.5 capitalize">{form.theme}</p>
+                <span className="text-muted-foreground uppercase font-semibold text-[10px]">Current Theme</span>
+                <p className="font-medium mt-0.5 capitalize">{getFormTheme(form.theme).name}</p>
               </div>
             </CardContent>
           </Card>
