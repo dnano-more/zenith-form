@@ -5,6 +5,9 @@ import { signSessionToken } from "../auth/jwt";
 import { env } from "../env";
 import { googleOAuth2Client } from "../clients/google-oauth";
 import { GetAuthenticationMethodOutputSchema } from "./model";
+import FormService from "../form";
+
+const formService = new FormService();
 
 const GUEST_EMAIL = "demo@zenithform.com";
 const GUEST_NAME = "Demo User";
@@ -93,6 +96,8 @@ class UserService {
       .where(eq(usersTable.email, GUEST_EMAIL))
       .limit(1);
 
+    const isNewGuest = !existingGuest;
+
     const guestUser =
       existingGuest ??
       (
@@ -108,6 +113,15 @@ class UserService {
 
     if (!guestUser) {
       throw new Error("Failed to create guest user");
+    }
+
+    // Auto-seed sample forms ONLY for demo/guest account creation
+    if (isNewGuest) {
+      try {
+        await formService.seedSampleForms(guestUser.id);
+      } catch {
+        // Ignore seeding errors silently during guest login
+      }
     }
 
     const sessionToken = signSessionToken({

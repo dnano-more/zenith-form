@@ -42,6 +42,7 @@ import {
   Copy,
   MessageSquare,
   Sparkles,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { FORM_THEMES, getFormTheme } from "~/lib/themes";
@@ -58,8 +59,11 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
 
-  // Query user's forms
+  // Query current user info & forms
+  const { data: me } = trpc.user.whoAmI.useQuery();
   const { data: forms, isLoading } = trpc.form.getMyForms.useQuery();
+
+  const isDemoUser = me?.email === "demo@zenithform.com";
 
   // Create form mutation
   const createFormMutation = trpc.form.createForm.useMutation({
@@ -74,6 +78,15 @@ export default function DashboardPage() {
     onError: (err) => {
       toast.error(err.message || "Failed to create form");
     },
+  });
+
+  // Seed sample forms mutation
+  const seedMutation = trpc.form.seedSampleForms.useMutation({
+    onSuccess: () => {
+      toast.success("Sample forms & dummy responses loaded successfully!");
+      utils.form.getMyForms.invalidate();
+    },
+    onError: (err) => toast.error(err.message || "Failed to seed sample forms"),
   });
 
   // Publish form mutation
@@ -135,6 +148,71 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      {/* Create Form Modal Dialog */}
+      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <DialogContent className="sm:max-w-md">
+          <form onSubmit={handleCreateForm}>
+            <DialogHeader>
+              <DialogTitle>Create New Form</DialogTitle>
+              <DialogDescription>
+                Set a title, description, and visual theme for your interactive form.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase text-muted-foreground">Form Title *</label>
+                <Input
+                  placeholder="e.g. Customer Satisfaction Survey"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase text-muted-foreground">Description (Optional)</label>
+                <Textarea
+                  placeholder="Brief description explaining the purpose of this form..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase text-muted-foreground">Visual Theme *</label>
+                <Select value={selectedTheme} onValueChange={setSelectedTheme}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select visual theme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FORM_THEMES).map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        <div className="flex items-center gap-2">
+                          <Palette className="h-3.5 w-3.5 text-primary" />
+                          <span>{t.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={createFormMutation.isPending}>
+                {createFormMutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                Create Form
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
         <div>
@@ -144,76 +222,13 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Create Form Modal Trigger */}
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button size="default" className="gap-2 font-medium shadow-sm">
-              <Plus className="h-4 w-4" />
-              <span>Create New Form</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <form onSubmit={handleCreateForm}>
-              <DialogHeader>
-                <DialogTitle>Create New Form</DialogTitle>
-                <DialogDescription>
-                  Set a title, description, and visual theme for your interactive form.
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase text-muted-foreground">Form Title *</label>
-                  <Input
-                    placeholder="e.g. Customer Satisfaction Survey"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase text-muted-foreground">Description (Optional)</label>
-                  <Textarea
-                    placeholder="Brief description explaining the purpose of this form..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={3}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase text-muted-foreground">Visual Theme *</label>
-                  <Select value={selectedTheme} onValueChange={setSelectedTheme}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select visual theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(FORM_THEMES).map((t) => (
-                        <SelectItem key={t.id} value={t.id}>
-                          <div className="flex items-center gap-2">
-                            <Palette className="h-3.5 w-3.5 text-primary" />
-                            <span>{t.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={createFormMutation.isPending}>
-                  {createFormMutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                  Create Form
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        {/* Top-Right Create Button (Only shown when user has existing forms) */}
+        {forms && forms.length > 0 && (
+          <Button size="default" onClick={() => setIsCreateOpen(true)} className="gap-2 font-medium shadow-sm">
+            <Plus className="h-4 w-4" />
+            <span>Create New Form</span>
+          </Button>
+        )}
       </div>
 
       {/* Dashboard Toolbar: Search & Filter */}
@@ -245,25 +260,53 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Forms Grid */}
+      {/* Forms Grid or Clean Fresh Start Empty State */}
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
           <Loader2 className="h-8 w-8 animate-spin mb-3 text-primary" />
           <p className="text-sm font-medium">Loading your forms...</p>
         </div>
       ) : !forms || forms.length === 0 ? (
-        <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-12 text-center bg-card">
-          <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
-            <FileText className="h-6 w-6" />
+        <div className="flex flex-col items-center justify-center border-2 border-dashed border-border/80 rounded-3xl p-12 text-center bg-card/60 backdrop-blur-sm shadow-xl space-y-6 max-w-2xl mx-auto my-6">
+          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent text-primary border border-primary/20 flex items-center justify-center shadow-lg">
+            <Sparkles className="h-8 w-8" />
           </div>
-          <h3 className="text-lg font-bold">No forms created yet</h3>
-          <p className="text-sm text-muted-foreground max-w-sm mt-1 mb-6">
-            Get started by creating your first interactive form in seconds.
-          </p>
-          <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            <span>Create Your First Form</span>
-          </Button>
+
+          <div className="space-y-2">
+            <h3 className="text-2xl font-extrabold tracking-tight">No forms created yet</h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+              Build your first custom form from scratch with interactive fields and custom visual themes.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 w-full max-w-md">
+            <Button
+              size="lg"
+              onClick={() => setIsCreateOpen(true)}
+              className="w-full sm:w-auto gap-2 font-semibold shadow-md"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Create Your First Form</span>
+            </Button>
+
+            {/* Load Sample Data Button rendered ONLY for demo account users */}
+            {isDemoUser && (
+              <Button
+                size="lg"
+                variant="outline"
+                disabled={seedMutation.isPending}
+                onClick={() => seedMutation.mutate()}
+                className="w-full sm:w-auto gap-2 font-medium border-primary/30 hover:bg-primary/10 hover:border-primary/50 text-foreground"
+              >
+                {seedMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                ) : (
+                  <Zap className="h-4 w-4 text-amber-400 fill-amber-400" />
+                )}
+                <span>Load Sample Data</span>
+              </Button>
+            )}
+          </div>
         </div>
       ) : filteredForms.length === 0 ? (
         <div className="py-12 text-center border rounded-2xl bg-card">

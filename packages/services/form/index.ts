@@ -4,7 +4,7 @@ import { formsTable, formFieldsTable, formResponsesTable } from "@repo/database/
 import { generateSlug } from "../utils/slugify";
 import type { CreateFormInput, UpdateFormInput } from "./model";
 
-class FormService {
+export class FormService {
   // Ownership check — reusable helper, har jagah repeat nahi karna padega
   private async getOwnedForm(formId: string, userId: string) {
     const [form] = await db
@@ -316,5 +316,4 @@ class FormService {
   }
 }
 
-export const formService = new FormService();
-export default formService;
+export default FormService;
