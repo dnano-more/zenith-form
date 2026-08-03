@@ -60,9 +60,9 @@ export const formRouter = router({
     .meta({ openapi: { method: "GET", path: getPath("/public/{formId}"), tags: TAGS } })
     .input(formIdInputSchema)
     .output(publicFormOutputSchema)
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       try {
-        return await formService.getPublicForm(input.formId);
+        return await formService.getPublicForm(input.formId, ctx.user?.userId);
       } catch (error) {
         handleServiceError(error);
       }

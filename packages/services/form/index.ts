@@ -137,7 +137,7 @@ export class FormService {
     return { success: true as const };
   }
 
-  public async getPublicForm(formId: string) {
+  public async getPublicForm(formId: string, currentUserId?: string) {
     const [form] = await db
       .select()
       .from(formsTable)
@@ -148,7 +148,9 @@ export class FormService {
       throw new Error("FORM_NOT_FOUND");
     }
 
-    if (form.status !== "published") {
+    const isCreator = !!(currentUserId && currentUserId === form.creatorId);
+
+    if (form.status !== "published" && !isCreator) {
       throw new Error("FORM_NOT_PUBLISHED");
     }
 

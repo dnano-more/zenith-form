@@ -32,7 +32,7 @@ class ResponseService {
     return form;
   }
 
-  public async submitResponse(input: SubmitResponseInput, requesterIp: string) {
+  public async submitResponse(input: SubmitResponseInput, requesterIp: string, currentUserId?: string) {
     const [form] = await db
       .select()
       .from(formsTable)
@@ -43,7 +43,9 @@ class ResponseService {
       throw new Error("FORM_NOT_FOUND");
     }
 
-    if (form.status !== "published") {
+    const isCreator = !!(currentUserId && currentUserId === form.creatorId);
+
+    if (form.status !== "published" && !isCreator) {
       throw new Error("FORM_NOT_PUBLISHED");
     }
 
@@ -58,6 +60,16 @@ class ResponseService {
       const err = new Error("VALIDATION_FAILED");
       (err as Error & { validationErrors?: typeof errors }).validationErrors = errors;
       throw err;
+    }
+
+    if (form.status === "draft" && isCreator) {
+      return {
+        id: "00000000-0000-0000-0000-000000000000",
+        formId: input.formId,
+        answers: cleanedAnswers,
+        submitterIpHash: "",
+        submittedAt: new Date(),
+      };
     }
 
     const [response] = await db

@@ -41,8 +41,106 @@ import {
   ListFilter,
   CheckSquare,
   Sparkles,
+  Copy,
+  ExternalLink,
+  Inbox,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Skeleton } from "~/components/ui/skeleton";
+
+function FormAnalyticsSkeleton() {
+  return (
+    <div className="space-y-8 animate-in fade-in-50 duration-300">
+      {/* Header Skeleton */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-9 w-9 rounded-lg" />
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-7 w-52 rounded-md" />
+              <Skeleton className="h-5 w-32 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-80 rounded-md" />
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-9 w-28 rounded-lg" />
+          <Skeleton className="h-9 w-28 rounded-lg" />
+        </div>
+      </div>
+
+      {/* Top 3 Overview Cards Skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="border-border/60 p-6 space-y-3">
+            <div className="flex justify-between items-center">
+              <Skeleton className="h-4 w-28 rounded-md" />
+              <Skeleton className="h-5 w-5 rounded-md" />
+            </div>
+            <Skeleton className="h-8 w-16 rounded-md" />
+            <Skeleton className="h-3 w-24 rounded-md" />
+          </Card>
+        ))}
+      </div>
+
+      {/* Tabs List Skeleton */}
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-64 rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="border-border/60 p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-6 w-6 rounded-md" />
+                <Skeleton className="h-4 w-20 rounded-full" />
+              </div>
+              <Skeleton className="h-6 w-48 rounded-md" />
+              <div className="space-y-2 pt-2">
+                <Skeleton className="h-3 w-full rounded-full" />
+                <Skeleton className="h-3 w-3/4 rounded-full" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsEmptyState({ formId }: { formId: string }) {
+  const copyPublicLink = () => {
+    const publicUrl = `${window.location.origin}/f/${formId}`;
+    navigator.clipboard.writeText(publicUrl);
+    toast.success("Public form link copied to clipboard!");
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center border-2 border-dashed border-border/80 rounded-3xl p-12 text-center bg-card/60 backdrop-blur-sm shadow-sm space-y-6 max-w-2xl mx-auto my-6">
+      <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent text-primary border border-primary/20 flex items-center justify-center shadow-md">
+        <Inbox className="h-8 w-8" />
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="text-2xl font-extrabold tracking-tight">No responses submitted yet</h3>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+          Share your form link with respondents or test a submission yourself to start viewing live analytics.
+        </p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 w-full max-w-md">
+        <Button size="default" onClick={copyPublicLink} className="w-full sm:w-auto gap-2 font-medium shadow-sm">
+          <Copy className="h-4 w-4" />
+          <span>Copy Public Form Link</span>
+        </Button>
+        <Link href={`/f/${formId}`} target="_blank" className="w-full sm:w-auto">
+          <Button size="default" variant="outline" className="w-full sm:w-auto gap-2 font-medium border-primary/20 hover:bg-primary/5">
+            <ExternalLink className="h-4 w-4" />
+            <span>Open Live Form</span>
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 type FormField = {
   id: string;
@@ -143,13 +241,8 @@ export default function FormAnalyticsPage() {
 
   const totalPages = Math.ceil(filteredResponses.length / limit) || 1;
 
-  if (isFormLoading || isAnalyticsLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-        <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
-        <p className="text-sm font-medium">Loading analytics dashboard...</p>
-      </div>
-    );
+  if (isFormLoading || isAnalyticsLoading || isResponsesLoading) {
+    return <FormAnalyticsSkeleton />;
   }
 
   if (!form || !analytics) {
@@ -267,7 +360,9 @@ export default function FormAnalyticsPage() {
 
         {/* Tab 1: Analytics Breakdown */}
         <TabsContent value="summary" className="space-y-6">
-          {analytics.perField.length === 0 ? (
+          {analytics.totalResponses === 0 ? (
+            <AnalyticsEmptyState formId={form.id} />
+          ) : analytics.perField.length === 0 ? (
             <Card className="p-8 text-center border-dashed">
               <p className="text-sm text-muted-foreground">No questions configured for this form.</p>
             </Card>
@@ -376,7 +471,10 @@ export default function FormAnalyticsPage() {
 
         {/* Tab 2: Individual Submissions */}
         <TabsContent value="submissions" className="space-y-6">
-          <Card className="border-border/60 shadow-sm">
+          {analytics.totalResponses === 0 ? (
+            <AnalyticsEmptyState formId={form.id} />
+          ) : (
+            <Card className="border-border/60 shadow-sm">
             <CardHeader className="pb-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -529,6 +627,7 @@ export default function FormAnalyticsPage() {
               )}
             </CardContent>
           </Card>
+          )}
         </TabsContent>
       </Tabs>
 

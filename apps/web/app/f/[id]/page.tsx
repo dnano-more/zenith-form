@@ -163,9 +163,13 @@ export default function PublicFormPage() {
           <div className="h-16 w-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
             <CheckCircle2 className="h-10 w-10" />
           </div>
-          <h2 className="text-2xl font-extrabold">Thank You!</h2>
+          <h2 className="text-2xl font-extrabold">
+            {form.status === "draft" ? "Draft Test Complete!" : "Thank You!"}
+          </h2>
           <p className={`text-sm leading-relaxed ${themeConfig.subtextClass}`}>
-            Your response has been recorded securely. We appreciate your feedback.
+            {form.status === "draft"
+              ? "Your test answers were validated in draft preview mode (dry-run)."
+              : "Your response has been recorded securely. We appreciate your feedback."}
           </p>
           <div className={`pt-4 border-t border-border/40 text-xs flex items-center justify-center gap-1.5 ${themeConfig.subtextClass}`}>
             <span>Powered by</span>
@@ -189,6 +193,13 @@ export default function PublicFormPage() {
 
   return (
     <div className={`min-h-screen flex flex-col justify-between font-sans antialiased transition-colors duration-500 ${themeConfig.bgClass}`}>
+      {/* Creator Draft Mode Banner */}
+      {form.status === "draft" && (
+        <div className="bg-amber-500/15 border-b border-amber-500/30 text-amber-600 dark:text-amber-400 px-4 py-2.5 text-xs font-semibold text-center flex items-center justify-center gap-2 shadow-sm">
+          <Sparkles className="h-4 w-4" />
+          <span>Creator Draft Preview Mode &mdash; Testing form before publishing. Answers will not be saved to analytics.</span>
+        </div>
+      )}
       {/* Top Header & Progress */}
       <header className={`px-6 py-4 ${themeConfig.headerClass}`}>
         <div className="max-w-3xl mx-auto flex items-center justify-between">

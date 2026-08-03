@@ -60,7 +60,7 @@ export const responseRouter = router({
       }
 
       try {
-        const response = await responseService.submitResponse(input, requesterIp);
+        const response = await responseService.submitResponse(input, requesterIp, ctx.user?.userId);
         return { success: true as const, responseId: response.id };
       } catch (err) {
         handleServiceError(err);

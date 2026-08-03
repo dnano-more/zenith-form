@@ -45,9 +45,88 @@ import {
   ShieldCheck,
   ChevronDown,
   Settings2,
+  Share2,
+  Copy,
+  Download,
+  Code,
+  QrCode,
+  Link as LinkIcon,
+  BarChart3,
 } from "lucide-react";
 import { toast } from "sonner";
 import { FORM_THEMES, getFormTheme } from "~/lib/themes";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { QRCodeCanvas } from "qrcode.react";
+
+function FormBuilderSkeleton() {
+  return (
+    <div className="space-y-8 animate-in fade-in-50 duration-300">
+      {/* Top Header Skeleton */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-9 w-9 rounded-lg" />
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-7 w-48 rounded-md" />
+              <Skeleton className="h-5 w-20 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-72 rounded-md" />
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-9 w-28 rounded-lg" />
+          <Skeleton className="h-9 w-32 rounded-lg" />
+          <Skeleton className="h-9 w-28 rounded-lg" />
+        </div>
+      </div>
+
+      {/* Main Builder Grid Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column: Form Settings Skeleton */}
+        <div className="lg:col-span-1 space-y-6">
+          <Card className="border-border/60">
+            <CardHeader className="space-y-2">
+              <Skeleton className="h-5 w-32 rounded-md" />
+              <Skeleton className="h-4 w-48 rounded-md" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-10 w-full rounded-md" />
+              <Skeleton className="h-20 w-full rounded-md" />
+              <Skeleton className="h-10 w-full rounded-md" />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column: Question Fields Skeleton */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-6 w-36 rounded-md" />
+            <Skeleton className="h-9 w-32 rounded-lg" />
+          </div>
+
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="border-border/60 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-5 rounded-md" />
+                  <Skeleton className="h-5 w-40 rounded-md" />
+                  <Skeleton className="h-4 w-16 rounded-full" />
+                </div>
+                <div className="flex items-center gap-1">
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                </div>
+              </div>
+              <Skeleton className="h-10 w-full rounded-md bg-muted/40" />
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const FIELD_TYPES = [
   { value: "short_text", label: "Short Text", icon: Type },
@@ -79,6 +158,7 @@ export default function FormBuilderPage() {
   const utils = trpc.useUtils();
 
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const [isAddAdvancedOpen, setIsAddAdvancedOpen] = useState(false);
   const [fieldType, setFieldType] = useState<FieldTypeEnum>("short_text");
   const [label, setLabel] = useState("");
@@ -86,6 +166,35 @@ export default function FormBuilderPage() {
   const [helpText, setHelpText] = useState("");
   const [required, setRequired] = useState(false);
   const [optionsText, setOptionsText] = useState("");
+
+  const publicUrl = typeof window !== "undefined" ? `${window.location.origin}/f/${formId}` : `/f/${formId}`;
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(publicUrl);
+    toast.success("Public form link copied to clipboard!");
+  };
+
+  const handleDownloadQR = () => {
+    const canvas = document.getElementById("form-qr-canvas") as HTMLCanvasElement;
+    if (!canvas) {
+      toast.error("QR Code image not available");
+      return;
+    }
+    const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+    const downloadLink = document.createElement("a");
+    downloadLink.href = pngUrl;
+    downloadLink.download = `${form?.slug || "form"}-qr-code.png`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    toast.success("QR Code downloaded!");
+  };
+
+  const handleCopyEmbed = () => {
+    const embedCode = `<iframe src="${publicUrl}" width="100%" height="600px" frameborder="0"></iframe>`;
+    navigator.clipboard.writeText(embedCode);
+    toast.success("IFrame embed code copied to clipboard!");
+  };
 
   // Validation Rules State for Add Field
   const [pattern, setPattern] = useState("");
@@ -334,13 +443,8 @@ export default function FormBuilderPage() {
     });
   };
 
-  if (isFormLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-        <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
-        <p className="text-sm font-medium">Loading form builder...</p>
-      </div>
-    );
+  if (isFormLoading || isFieldsLoading) {
+    return <FormBuilderSkeleton />;
   }
 
   if (!form) {
@@ -379,35 +483,55 @@ export default function FormBuilderPage() {
         <div className="flex items-center gap-2">
           {form.status === "published" ? (
             <>
-              <Link href={`/f/${form.id}`} target="_blank">
-                <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  <span>Preview Public Form</span>
-                </Button>
-              </Link>
+              <Button
+                size="sm"
+                className="text-xs gap-1.5 shadow-sm font-semibold"
+                onClick={() => setIsShareOpen(true)}
+              >
+                <Share2 className="h-3.5 w-3.5" />
+                <span>Share Form</span>
+              </Button>
+
               <Button
                 variant="secondary"
                 size="sm"
-                className="text-xs text-amber-500 hover:text-amber-600"
+                className="text-xs text-amber-500 hover:text-amber-600 border border-amber-500/20"
                 onClick={() => unpublishMutation.mutate({ formId: form.id })}
+                disabled={unpublishMutation.isPending}
               >
-                Unpublish
+                {unpublishMutation.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1 text-amber-500" />}
+                <span>Unpublish</span>
               </Button>
             </>
           ) : (
-            <Button
-              size="sm"
-              className="text-xs gap-1.5 shadow-sm"
-              onClick={() => publishMutation.mutate({ formId: form.id })}
-            >
-              <Globe className="h-3.5 w-3.5" />
-              <span>Publish Form</span>
-            </Button>
+            <>
+              <Link href={`/f/${form.id}`} target="_blank">
+                <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  <span>Preview</span>
+                </Button>
+              </Link>
+
+              <Button
+                size="sm"
+                className="text-xs gap-1.5 shadow-sm"
+                onClick={() => publishMutation.mutate({ formId: form.id })}
+                disabled={publishMutation.isPending}
+              >
+                {publishMutation.isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Globe className="h-3.5 w-3.5" />
+                )}
+                <span>Publish Form</span>
+              </Button>
+            </>
           )}
 
           <Link href={`/dashboard/forms/${form.id}/analytics`}>
-            <Button variant="outline" size="sm" className="text-xs">
-              View Analytics
+            <Button variant="outline" size="sm" className="text-xs gap-1.5">
+              <BarChart3 className="h-3.5 w-3.5 text-primary" />
+              <span>View Analytics</span>
             </Button>
           </Link>
         </div>
@@ -1119,6 +1243,122 @@ export default function FormBuilderPage() {
         </div>
 
       </div>
+
+      {/* Share Form Modal Dialog */}
+      <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
+        <DialogContent className="sm:max-w-lg space-y-4 bg-card/95 backdrop-blur-md border-border/80 shadow-2xl">
+          <DialogHeader className="space-y-1.5 border-b pb-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary border border-primary/20 flex items-center justify-center">
+                <Share2 className="h-4 w-4" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold tracking-tight">Share Form</DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground">
+                  Distribute your published form via direct link, QR code, or embedded iframe.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <Tabs defaultValue="link" className="w-full pt-1">
+            <TabsList className="grid grid-cols-3 w-full bg-muted/60 p-1">
+              <TabsTrigger value="link" className="text-xs font-medium gap-1.5">
+                <LinkIcon className="h-3.5 w-3.5" />
+                <span>Direct Link</span>
+              </TabsTrigger>
+              <TabsTrigger value="qr" className="text-xs font-medium gap-1.5">
+                <QrCode className="h-3.5 w-3.5" />
+                <span>QR Code</span>
+              </TabsTrigger>
+              <TabsTrigger value="embed" className="text-xs font-medium gap-1.5">
+                <Code className="h-3.5 w-3.5" />
+                <span>Embed Code</span>
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Tab 1: Direct Link */}
+            <TabsContent value="link" className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">
+                  Public Form URL
+                </label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    readOnly
+                    value={publicUrl}
+                    className="font-mono text-xs bg-muted/30 h-10"
+                  />
+                  <Button size="default" onClick={handleCopyLink} className="gap-1.5 shrink-0 font-medium text-xs shadow-sm">
+                    <Copy className="h-3.5 w-3.5" />
+                    <span>Copy Link</span>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-3.5 rounded-xl bg-muted/20 border border-border/60 text-xs">
+                <span className="text-muted-foreground font-medium">Test live form respondent view</span>
+                <Link href={`/f/${form.id}`} target="_blank">
+                  <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                    <span>Open Live Form</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                </Link>
+              </div>
+            </TabsContent>
+
+            {/* Tab 2: Auto-Generated QR Code */}
+            <TabsContent value="qr" className="space-y-4 pt-4 flex flex-col items-center justify-center text-center">
+              <div className="p-4 bg-white rounded-2xl border shadow-lg flex items-center justify-center">
+                <QRCodeCanvas
+                  id="form-qr-canvas"
+                  value={publicUrl}
+                  size={180}
+                  level="H"
+                  marginSize={2}
+                  bgColor="#ffffff"
+                  fgColor="#0f172a"
+                />
+              </div>
+
+              <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
+                Scan with any smartphone camera to instantly open and submit this form.
+              </p>
+
+              <Button onClick={handleDownloadQR} variant="outline" size="sm" className="gap-2 text-xs font-medium border-primary/20 hover:bg-primary/5">
+                <Download className="h-3.5 w-3.5 text-primary" />
+                <span>Download QR Code (.png)</span>
+              </Button>
+            </TabsContent>
+
+            {/* Tab 3: IFrame Embed Code */}
+            <TabsContent value="embed" className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">
+                  Pre-Formatted IFrame Embed HTML
+                </label>
+                <Textarea
+                  readOnly
+                  rows={4}
+                  value={`<iframe src="${publicUrl}" width="100%" height="600px" frameborder="0"></iframe>`}
+                  className="font-mono text-xs bg-muted/30 resize-none p-3 leading-relaxed"
+                />
+              </div>
+
+              <Button size="default" onClick={handleCopyEmbed} className="w-full gap-2 text-xs font-medium shadow-sm">
+                <Code className="h-3.5 w-3.5" />
+                <span>Copy Embed Code</span>
+              </Button>
+            </TabsContent>
+          </Tabs>
+
+          <DialogFooter className="pt-2 border-t">
+            <Button variant="outline" size="sm" onClick={() => setIsShareOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
