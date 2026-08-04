@@ -35,25 +35,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       toast.success("Logged out successfully");
       utils.user.whoAmI.setData(undefined, null as unknown as { userId: string; email: string });
       await utils.invalidate();
-      router.push("/login");
+      router.replace("/login");
     },
     onError: (err) => {
       toast.error(err.message || "Failed to log out");
     },
   });
 
-  if (isLoading) {
+  // Redirect unauthenticated user
+  React.useEffect(() => {
+    if (!isLoading && (isError || !user)) {
+      router.replace("/login");
+    }
+  }, [isLoading, isError, user, router]);
+
+  if (isLoading || isError || !user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
         <p className="text-sm text-muted-foreground font-medium">Verifying Session...</p>
       </div>
     );
-  }
-
-  if (isError || !user) {
-    router.push("/login");
-    return null;
   }
 
   return (
