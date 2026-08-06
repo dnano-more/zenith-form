@@ -6,9 +6,8 @@ import { useRouter } from "next/navigation";
 import { trpc } from "~/trpc/client";
 import { Navbar } from "~/components/navbar";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
-import { FormInput, Sparkles, UserCheck, ArrowRight, Loader2 } from "lucide-react";
+import { Card, CardContent } from "~/components/ui/card";
+import { FormInput, UserCheck, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
@@ -43,39 +42,37 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans antialiased">
-      <Navbar />
+      {/* 1. Header Navigation Cleanup (Logo & Theme Switcher only) */}
+      <Navbar minimal />
 
-      <main className="flex-1 flex items-center justify-center py-12 px-4">
+      <main className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6">
         <div className="w-full max-w-md space-y-6">
           
-          {/* Top Brand Info */}
+          {/* Top Brand Info - Clean non-redundant heading */}
           <div className="text-center space-y-2">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md mb-2">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm mb-1">
               <FormInput className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight">Welcome to Zenith Form</h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground max-w-xs mx-auto">
               Sign in to manage your forms, fields, and view real-time analytics
             </p>
           </div>
 
-          <Card className="border-border/60 shadow-lg">
-            <CardHeader className="text-center pb-4">
-              <CardTitle className="text-lg font-semibold">Sign In</CardTitle>
-              <CardDescription>Choose your preferred sign-in method</CardDescription>
-            </CardHeader>
-
-            <CardContent className="space-y-4">
-              {/* Google OAuth Login Button */}
+          {/* Main Auth Card with generous vertical padding */}
+          <Card className="border-border/60 shadow-xl rounded-2xl overflow-hidden">
+            <CardContent className="p-6 sm:p-8 space-y-5">
+              
+              {/* 2. Primary Action: Google OAuth Login Button */}
               {isProvidersLoading ? (
-                <Button variant="outline" className="w-full h-11" disabled>
+                <Button variant="default" className="w-full h-11 font-medium" disabled>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   Loading Auth Providers...
                 </Button>
               ) : googleProvider ? (
                 <a href={googleProvider.authUrl} className="block w-full">
-                  <Button variant="outline" className="w-full h-11 font-medium gap-2 hover:bg-accent">
-                    <svg className="h-4 w-4" viewBox="0 0 24 24">
+                  <Button variant="default" className="w-full h-11 font-medium gap-3 shadow-md hover:opacity-95 transition-all text-sm">
+                    <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
                       <path
                         fill="#4285F4"
                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -98,19 +95,22 @@ export default function LoginPage() {
                 </a>
               ) : null}
 
-              {/* Guest Demo Login Button */}
-              <div className="relative py-2">
+              {/* 3. Micro-copy: Simplified clean "OR" divider */}
+              <div className="relative py-1">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border" />
+                  <span className="w-full border-t border-border/60" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground font-medium">Or for testing</span>
+                  <span className="bg-card px-3 text-muted-foreground/70 font-semibold tracking-wider text-[11px]">
+                    OR
+                  </span>
                 </div>
               </div>
 
+              {/* Secondary Action: Instant Demo Access (Guest Login) */}
               <Button
-                variant="default"
-                className="w-full h-11 font-medium gap-2 shadow-sm"
+                variant="outline"
+                className="w-full h-11 font-medium gap-2 border-border/80 hover:bg-accent hover:text-accent-foreground transition-all text-sm"
                 onClick={handleGuestLogin}
                 disabled={isGuestLoading}
               >
@@ -121,25 +121,28 @@ export default function LoginPage() {
                   </>
                 ) : (
                   <>
-                    <UserCheck className="h-4 w-4 text-primary-foreground" />
+                    <UserCheck className="h-4 w-4 text-muted-foreground" />
                     <span>Instant Demo Access (Guest Login)</span>
                   </>
                 )}
               </Button>
 
-              <div className="pt-2 text-center">
-                <Badge variant="secondary" className="text-[11px] font-normal text-muted-foreground gap-1">
-                  <Sparkles className="h-3 w-3 text-amber-500" />
-                  Guest mode provides full creator dashboard permissions
-                </Badge>
-              </div>
+              {/* Subtle helper text for Guest Mode */}
+              <p className="text-xs text-center text-muted-foreground/80 leading-relaxed pt-1">
+                Guest mode provides full creator dashboard permissions for testing.
+              </p>
+
             </CardContent>
           </Card>
 
-          {/* Footer Back Link */}
-          <div className="text-center text-xs text-muted-foreground">
-            <Link href="/" className="hover:text-foreground transition-colors inline-flex items-center gap-1">
-              <span>← Back to Landing Page</span>
+          {/* 4. Spacing & Layout Polish: Clean Footer Back Link */}
+          <div className="text-center text-xs text-muted-foreground pt-4 mt-6">
+            <Link
+              href="/"
+              className="hover:text-foreground transition-colors inline-flex items-center gap-1.5 font-medium"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Back to Landing Page</span>
             </Link>
           </div>
 
@@ -148,3 +151,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

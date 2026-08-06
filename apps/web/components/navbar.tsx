@@ -4,7 +4,11 @@ import { Badge } from "~/components/ui/badge";
 import { FormInput, Sparkles } from "lucide-react";
 import { ThemeToggle } from "~/components/theme-toggle";
 
-export function Navbar() {
+interface NavbarProps {
+  minimal?: boolean;
+}
+
+export function Navbar({ minimal = false }: NavbarProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-8">
@@ -23,37 +27,43 @@ export function Navbar() {
         </Link>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-          <Link href="/#features" className="hover:text-foreground transition-colors">
-            Features
-          </Link>
-          <Link href="/#pricing" className="hover:text-foreground transition-colors">
-            Pricing
-          </Link>
-          <a
-            href="http://localhost:8000/docs"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-foreground transition-colors flex items-center gap-1"
-          >
-            <span>API Docs</span>
-            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-          </a>
-        </nav>
+        {!minimal && (
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
+            <Link href="/#features" className="hover:text-foreground transition-colors">
+              Features
+            </Link>
+            <Link href="/#pricing" className="hover:text-foreground transition-colors">
+              Pricing
+            </Link>
+            <a
+              href="http://localhost:8000/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors flex items-center gap-1"
+            >
+              <span>API Docs</span>
+              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+            </a>
+          </nav>
+        )}
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
-          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-            <Link href="/login">
-              Sign In
-            </Link>
-          </Button>
-          <Button asChild size="sm" className="font-medium shadow-sm">
-            <Link href="/login">
-              Get Started Free
-            </Link>
-          </Button>
+          {!minimal && (
+            <>
+              <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+                <Link href="/login">
+                  Sign In
+                </Link>
+              </Button>
+              <Button asChild size="sm" className="font-medium shadow-sm">
+                <Link href="/login">
+                  Get Started Free
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
 
       </div>

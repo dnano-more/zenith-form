@@ -28,7 +28,7 @@ class UserService {
       supportedAuthenticationProviders.push({
         provider: "GOOGLE_OAUTH",
         displayName: "Google",
-        displayText: "Signin with Google",
+        displayText: "Sign in with Google",
         authUrl: url,
       });
     }
