@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
 
   // Query authenticated user info
-  const { data: user, isLoading, isError } = trpc.user.whoAmI.useQuery(undefined, {
+  const { data: user, isLoading, isError, isFetching } = trpc.user.whoAmI.useQuery(undefined, {
     retry: false,
   });
 
@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: async () => {
       toast.success("Logged out successfully");
-      utils.user.whoAmI.setData(undefined, null as unknown as { userId: string; email: string });
+      utils.user.whoAmI.reset();
       await utils.invalidate();
       router.replace("/login");
     },
@@ -44,12 +44,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // Redirect unauthenticated user
   React.useEffect(() => {
-    if (!isLoading && (isError || !user)) {
+    if (!isLoading && !isFetching && (isError || !user)) {
       router.replace("/login");
     }
-  }, [isLoading, isError, user, router]);
+  }, [isLoading, isFetching, isError, user, router]);
 
-  if (isLoading || isError || !user) {
+  if (isLoading || (isFetching && !user) || isError || !user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />

@@ -25,7 +25,7 @@ export default function LoginPage() {
   const guestLoginMutation = trpc.auth.loginAsGuest.useMutation({
     onSuccess: async () => {
       toast.success("Logged in as Guest user");
-      await utils.user.whoAmI.invalidate();
+      await utils.user.whoAmI.refetch();
       router.push("/dashboard");
     },
     onError: (err) => {
