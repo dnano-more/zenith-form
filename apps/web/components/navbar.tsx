@@ -44,16 +44,16 @@ export function Navbar() {
         {/* Action Buttons */}
         <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
-          <Link href="/login">
-            <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
+          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+            <Link href="/login">
               Sign In
-            </Button>
-          </Link>
-          <Link href="/login">
-            <Button size="sm" className="font-medium shadow-sm">
+            </Link>
+          </Button>
+          <Button asChild size="sm" className="font-medium shadow-sm">
+            <Link href="/login">
               Get Started Free
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
 
       </div>

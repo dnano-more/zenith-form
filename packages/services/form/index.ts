@@ -195,126 +195,140 @@ export class FormService {
   }
 
   public async seedSampleForms(creatorId: string) {
-    // Form 1: Customer Feedback & Support
-    const slug1 = generateSlug("Customer Feedback & Support");
-    const [form1] = await db
-      .insert(formsTable)
-      .values({
-        creatorId,
-        title: "Customer Feedback & Support",
-        description: "Pre-built sample form to collect customer satisfaction ratings and feedback.",
-        theme: "cyber_neon",
-        visibility: "public",
-        status: "published",
-        slug: slug1,
-        publishedAt: new Date(),
-      })
-      .returning();
-
-    if (form1) {
-      const [f1, f2, f3, f4, f5, f6] = await db
-        .insert(formFieldsTable)
-        .values([
-          { formId: form1.id, type: "short_text", label: "Full Name", placeholder: "Jane Doe", required: true, order: 0 },
-          { formId: form1.id, type: "email", label: "Email Address", placeholder: "jane@example.com", required: true, order: 1 },
-          { formId: form1.id, type: "phone", label: "Phone Number", placeholder: "+1 (555) 000-0000", required: false, order: 2 },
-          { formId: form1.id, type: "rating", label: "Overall Satisfaction Rating", required: true, order: 3 },
-          { formId: form1.id, type: "single_select", label: "Would you recommend our product?", options: ["Definitely", "Maybe", "Not likely"], required: true, order: 4 },
-          { formId: form1.id, type: "long_text", label: "Detailed Feedback & Suggestions", placeholder: "Share your detailed thoughts...", required: false, order: 5 },
-        ])
+    return await db.transaction(async (tx) => {
+      // Form 1: Customer Feedback & Support
+      const slug1 = generateSlug("Customer Feedback & Support");
+      const [form1] = await tx
+        .insert(formsTable)
+        .values({
+          creatorId,
+          title: "Customer Feedback & Support",
+          description: "Pre-built sample form to collect customer satisfaction ratings and feedback.",
+          theme: "cyber_neon",
+          visibility: "public",
+          status: "published",
+          slug: slug1,
+          publishedAt: new Date(),
+        })
         .returning();
 
-      if (f1 && f2 && f3 && f4 && f5 && f6) {
-        await db.insert(formResponsesTable).values([
-          {
-            formId: form1.id,
-            answers: {
-              [f1.id]: "Alex Johnson",
-              [f2.id]: "alex@example.com",
-              [f3.id]: "+1 555-019-2834",
-              [f4.id]: 5,
-              [f5.id]: "Definitely",
-              [f6.id]: "Amazing user interface and lightning-fast form submissions!",
+      if (form1) {
+        const fields1 = await tx
+          .insert(formFieldsTable)
+          .values([
+            { formId: form1.id, type: "short_text", label: "Full Name", placeholder: "Jane Doe", required: true, order: 0 },
+            { formId: form1.id, type: "email", label: "Email Address", placeholder: "jane@example.com", required: true, order: 1 },
+            { formId: form1.id, type: "phone", label: "Phone Number", placeholder: "+1 (555) 000-0000", required: false, order: 2 },
+            { formId: form1.id, type: "rating", label: "Overall Satisfaction Rating", required: true, order: 3 },
+            { formId: form1.id, type: "single_select", label: "Would you recommend our product?", options: ["Definitely", "Maybe", "Not likely"], required: true, order: 4 },
+            { formId: form1.id, type: "long_text", label: "Detailed Feedback & Suggestions", placeholder: "Share your detailed thoughts...", required: false, order: 5 },
+          ])
+          .returning();
+
+        const f1 = fields1.find((f) => f.order === 0);
+        const f2 = fields1.find((f) => f.order === 1);
+        const f3 = fields1.find((f) => f.order === 2);
+        const f4 = fields1.find((f) => f.order === 3);
+        const f5 = fields1.find((f) => f.order === 4);
+        const f6 = fields1.find((f) => f.order === 5);
+
+        if (f1 && f2 && f3 && f4 && f5 && f6) {
+          await tx.insert(formResponsesTable).values([
+            {
+              formId: form1.id,
+              answers: {
+                [f1.id]: "Alex Johnson",
+                [f2.id]: "alex@example.com",
+                [f3.id]: "+1 555-019-2834",
+                [f4.id]: 5,
+                [f5.id]: "Definitely",
+                [f6.id]: "Amazing user interface and lightning-fast form submissions!",
+              },
             },
-          },
-          {
-            formId: form1.id,
-            answers: {
-              [f1.id]: "Samantha Reed",
-              [f2.id]: "samantha.r@techcorp.io",
-              [f3.id]: "+1 555-014-9921",
-              [f4.id]: 4,
-              [f5.id]: "Definitely",
-              [f6.id]: "Great product experience, super smooth animations.",
+            {
+              formId: form1.id,
+              answers: {
+                [f1.id]: "Samantha Reed",
+                [f2.id]: "samantha.r@techcorp.io",
+                [f3.id]: "+1 555-014-9921",
+                [f4.id]: 4,
+                [f5.id]: "Definitely",
+                [f6.id]: "Great product experience, super smooth animations.",
+              },
             },
-          },
-          {
-            formId: form1.id,
-            answers: {
-              [f1.id]: "Michael Chen",
-              [f2.id]: "m.chen@designhub.co",
-              [f3.id]: "+1 555-017-3342",
-              [f4.id]: 5,
-              [f5.id]: "Definitely",
-              [f6.id]: "The dark mode themes look stunning!",
+            {
+              formId: form1.id,
+              answers: {
+                [f1.id]: "Michael Chen",
+                [f2.id]: "m.chen@designhub.co",
+                [f3.id]: "+1 555-017-3342",
+                [f4.id]: 5,
+                [f5.id]: "Definitely",
+                [f6.id]: "The dark mode themes look stunning!",
+              },
             },
-          },
-        ]);
+          ]);
+        }
       }
-    }
 
-    // Form 2: Product Launch Event Registration
-    const slug2 = generateSlug("Product Launch Event Registration");
-    const [form2] = await db
-      .insert(formsTable)
-      .values({
-        creatorId,
-        title: "Product Launch Event Registration",
-        description: "Pre-built registration form for upcoming live launch events.",
-        theme: "emerald",
-        visibility: "public",
-        status: "published",
-        slug: slug2,
-        publishedAt: new Date(),
-      })
-      .returning();
-
-    if (form2) {
-      const [g1, g2, g3, g4] = await db
-        .insert(formFieldsTable)
-        .values([
-          { formId: form2.id, type: "short_text", label: "Full Name", placeholder: "John Smith", required: true, order: 0 },
-          { formId: form2.id, type: "email", label: "Work Email", placeholder: "john@company.com", required: true, order: 1 },
-          { formId: form2.id, type: "single_select", label: "Attendance Preference", options: ["In-Person (San Francisco)", "Virtual Livestream"], required: true, order: 2 },
-          { formId: form2.id, type: "number", label: "Number of Attendees", placeholder: "1", required: true, order: 3 },
-        ])
+      // Form 2: Product Launch Event Registration
+      const slug2 = generateSlug("Product Launch Event Registration");
+      const [form2] = await tx
+        .insert(formsTable)
+        .values({
+          creatorId,
+          title: "Product Launch Event Registration",
+          description: "Pre-built registration form for upcoming live launch events.",
+          theme: "emerald",
+          visibility: "public",
+          status: "published",
+          slug: slug2,
+          publishedAt: new Date(),
+        })
         .returning();
 
-      if (g1 && g2 && g3 && g4) {
-        await db.insert(formResponsesTable).values([
-          {
-            formId: form2.id,
-            answers: {
-              [g1.id]: "David Miller",
-              [g2.id]: "david@startup.io",
-              [g3.id]: "In-Person (San Francisco)",
-              [g4.id]: 2,
-            },
-          },
-          {
-            formId: form2.id,
-            answers: {
-              [g1.id]: "Elena Rostova",
-              [g2.id]: "elena@globaltech.com",
-              [g3.id]: "Virtual Livestream",
-              [g4.id]: 1,
-            },
-          },
-        ]);
-      }
-    }
+      if (form2) {
+        const fields2 = await tx
+          .insert(formFieldsTable)
+          .values([
+            { formId: form2.id, type: "short_text", label: "Full Name", placeholder: "John Smith", required: true, order: 0 },
+            { formId: form2.id, type: "email", label: "Work Email", placeholder: "john@company.com", required: true, order: 1 },
+            { formId: form2.id, type: "single_select", label: "Attendance Preference", options: ["In-Person (San Francisco)", "Virtual Livestream"], required: true, order: 2 },
+            { formId: form2.id, type: "number", label: "Number of Attendees", placeholder: "1", required: true, order: 3 },
+          ])
+          .returning();
 
-    return { success: true as const };
+        const g1 = fields2.find((f) => f.order === 0);
+        const g2 = fields2.find((f) => f.order === 1);
+        const g3 = fields2.find((f) => f.order === 2);
+        const g4 = fields2.find((f) => f.order === 3);
+
+        if (g1 && g2 && g3 && g4) {
+          await tx.insert(formResponsesTable).values([
+            {
+              formId: form2.id,
+              answers: {
+                [g1.id]: "David Miller",
+                [g2.id]: "david@startup.io",
+                [g3.id]: "In-Person (San Francisco)",
+                [g4.id]: 2,
+              },
+            },
+            {
+              formId: form2.id,
+              answers: {
+                [g1.id]: "Elena Rostova",
+                [g2.id]: "elena@globaltech.com",
+                [g3.id]: "Virtual Livestream",
+                [g4.id]: 1,
+              },
+            },
+          ]);
+        }
+      }
+
+      return { success: true as const };
+    });
   }
 }
 

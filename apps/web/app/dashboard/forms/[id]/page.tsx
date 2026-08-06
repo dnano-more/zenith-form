@@ -452,9 +452,9 @@ export default function FormBuilderPage() {
       <div className="text-center py-16">
         <h2 className="text-xl font-bold">Form not found</h2>
         <p className="text-sm text-muted-foreground mt-1 mb-4">The requested form does not exist or you do not have permission.</p>
-        <Link href="/dashboard">
-          <Button variant="outline">Back to Dashboard</Button>
-        </Link>
+        <Button asChild variant="outline">
+          <Link href="/dashboard">Back to Dashboard</Link>
+        </Button>
       </div>
     );
   }
@@ -464,11 +464,11 @@ export default function FormBuilderPage() {
       {/* Top Header Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard">
-            <Button variant="outline" size="icon" className="h-9 w-9">
+          <Button asChild variant="outline" size="icon" className="h-9 w-9">
+            <Link href="/dashboard">
               <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold tracking-tight">{form.title}</h1>
@@ -505,12 +505,12 @@ export default function FormBuilderPage() {
             </>
           ) : (
             <>
-              <Link href={`/f/${form.id}`} target="_blank">
-                <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+              <Button asChild variant="outline" size="sm" className="gap-1.5 text-xs">
+                <Link href={`/f/${form.id}`} target="_blank">
                   <ExternalLink className="h-3.5 w-3.5" />
                   <span>Preview</span>
-                </Button>
-              </Link>
+                </Link>
+              </Button>
 
               <Button
                 size="sm"
@@ -528,12 +528,12 @@ export default function FormBuilderPage() {
             </>
           )}
 
-          <Link href={`/dashboard/forms/${form.id}/analytics`}>
-            <Button variant="outline" size="sm" className="text-xs gap-1.5">
+          <Button asChild variant="outline" size="sm" className="text-xs gap-1.5">
+            <Link href={`/dashboard/forms/${form.id}/analytics`}>
               <BarChart3 className="h-3.5 w-3.5 text-primary" />
               <span>View Analytics</span>
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -1298,12 +1298,12 @@ export default function FormBuilderPage() {
 
               <div className="flex items-center justify-between p-3.5 rounded-xl bg-muted/20 border border-border/60 text-xs">
                 <span className="text-muted-foreground font-medium">Test live form respondent view</span>
-                <Link href={`/f/${form.id}`} target="_blank">
-                  <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                <Button asChild variant="outline" size="sm" className="h-8 text-xs gap-1">
+                  <Link href={`/f/${form.id}`} target="_blank">
                     <span>Open Live Form</span>
                     <ExternalLink className="h-3 w-3" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </TabsContent>
 

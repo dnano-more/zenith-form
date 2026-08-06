@@ -141,18 +141,18 @@ export default async function Home() {
 
             {/* Action CTAs */}
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/login" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto h-12 px-8 text-base font-semibold shadow-md gap-2">
+              <Button asChild size="lg" className="w-full sm:w-auto h-12 px-8 text-base font-semibold shadow-md gap-2">
+                <Link href="/login">
                   <span>Get Started Free</span>
                   <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
 
-              <Link href="/#pricing" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 text-base font-medium">
+              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 text-base font-medium">
+                <Link href="/#pricing">
                   View Pricing & Plans
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
 
             {/* Backend Health Badge */}
@@ -354,11 +354,11 @@ export default async function Home() {
                   </CardContent>
 
                   <CardFooter className="pt-4">
-                    <Link href="/login" className="w-full">
-                      <Button variant={tier.buttonVariant} className="w-full font-semibold">
+                    <Button asChild variant={tier.buttonVariant} className="w-full font-semibold">
+                      <Link href="/login">
                         {tier.buttonText}
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   </CardFooter>
                 </Card>
               ))}

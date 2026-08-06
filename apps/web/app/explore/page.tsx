@@ -41,12 +41,12 @@ export default function ExplorePage() {
             <p className="text-sm text-muted-foreground mt-1 mb-6">
               Be the first to publish a public form and share it with the world.
             </p>
-            <Link href="/login">
-              <Button className="gap-2">
+            <Button asChild className="gap-2">
+              <Link href="/login">
                 <FormInput className="h-4 w-4" />
                 <span>Create a Form</span>
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -61,7 +61,7 @@ export default function ExplorePage() {
                       Public Form
                     </Badge>
                     <span className="text-[11px] text-muted-foreground">
-                      Published {new Date(form.publishedAt ?? Date.now()).toLocaleDateString()}
+                      Published {form.publishedAt ? new Date(form.publishedAt).toLocaleDateString("en-US") : "Recently"}
                     </span>
                   </div>
 
@@ -72,12 +72,12 @@ export default function ExplorePage() {
                 </CardHeader>
 
                 <CardFooter className="pt-4 border-t">
-                  <Link href={`/f/${form.id}`} target="_blank" className="w-full">
-                    <Button variant="default" size="sm" className="w-full gap-2 font-medium">
+                  <Button asChild variant="default" size="sm" className="w-full gap-2 font-medium">
+                    <Link href={`/f/${form.id}`} target="_blank">
                       <span>Fill Form</span>
                       <ExternalLink className="h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 </CardFooter>
               </Card>
             ))}

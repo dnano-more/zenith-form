@@ -131,12 +131,12 @@ function AnalyticsEmptyState({ formId }: { formId: string }) {
           <Copy className="h-4 w-4" />
           <span>Copy Public Form Link</span>
         </Button>
-        <Link href={`/f/${formId}`} target="_blank" className="w-full sm:w-auto">
-          <Button size="default" variant="outline" className="w-full sm:w-auto gap-2 font-medium border-primary/20 hover:bg-primary/5">
+        <Button asChild size="default" variant="outline" className="w-full sm:w-auto gap-2 font-medium border-primary/20 hover:bg-primary/5">
+          <Link href={`/f/${formId}`} target="_blank">
             <ExternalLink className="h-4 w-4" />
             <span>Open Live Form</span>
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
     </div>
   );
@@ -250,9 +250,9 @@ export default function FormAnalyticsPage() {
       <div className="text-center py-16">
         <h2 className="text-xl font-bold">Analytics not found</h2>
         <p className="text-sm text-muted-foreground mt-1 mb-4">The form or analytics data could not be retrieved.</p>
-        <Link href="/dashboard">
-          <Button variant="outline">Back to Dashboard</Button>
-        </Link>
+        <Button asChild variant="outline">
+          <Link href="/dashboard">Back to Dashboard</Link>
+        </Button>
       </div>
     );
   }
@@ -264,11 +264,11 @@ export default function FormAnalyticsPage() {
       {/* Top Bar Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard">
-            <Button variant="outline" size="icon" className="h-9 w-9">
+          <Button asChild variant="outline" size="icon" className="h-9 w-9">
+            <Link href="/dashboard">
               <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold tracking-tight">{form.title}</h1>
@@ -288,11 +288,11 @@ export default function FormAnalyticsPage() {
             <span>Export CSV</span>
           </Button>
 
-          <Link href={`/dashboard/forms/${form.id}`}>
-            <Button variant="outline" size="sm" className="text-xs">
+          <Button asChild variant="outline" size="sm" className="text-xs">
+            <Link href={`/dashboard/forms/${form.id}`}>
               Edit Questions
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
 

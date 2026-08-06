@@ -74,27 +74,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
 
             <nav className="hidden sm:flex items-center gap-1">
-              <Link href="/dashboard">
-                <Button
-                  variant={pathname === "/dashboard" ? "secondary" : "ghost"}
-                  size="sm"
-                  className="gap-2 font-medium"
-                >
+              <Button
+                asChild
+                variant={pathname === "/dashboard" ? "secondary" : "ghost"}
+                size="sm"
+                className="gap-2 font-medium"
+              >
+                <Link href="/dashboard">
                   <LayoutDashboard className="h-4 w-4" />
                   <span>My Forms</span>
-                </Button>
-              </Link>
+                </Link>
+              </Button>
 
-              <Link href="/explore">
-                <Button
-                  variant={pathname === "/explore" ? "secondary" : "ghost"}
-                  size="sm"
-                  className="gap-2 font-medium"
-                >
+              <Button
+                asChild
+                variant={pathname === "/explore" ? "secondary" : "ghost"}
+                size="sm"
+                className="gap-2 font-medium"
+              >
+                <Link href="/explore">
                   <Globe className="h-4 w-4" />
                   <span>Explore Gallery</span>
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </nav>
           </div>
 
