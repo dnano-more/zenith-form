@@ -14,6 +14,7 @@ const TAGS = ["Forms"];
 const getPath = generatePath("/forms");
 
 function handleServiceError(error: unknown): never {
+  console.error("[Form Service Error]:", error);
   if (error instanceof Error) {
     if (error.message === "FORM_NOT_FOUND") {
       throw new TRPCError({ code: "NOT_FOUND", message: "Form not found" });
