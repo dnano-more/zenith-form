@@ -9,12 +9,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/accordion";
+import { InteractiveDemo } from "~/components/interactive-demo";
 import { api } from "~/trpc/server";
 import {
   ArrowRight,
   BarChart3,
   Check,
   FormInput,
+  Globe,
   HelpCircle,
   Layers,
   Server,
@@ -94,7 +96,7 @@ export default async function Home() {
     },
     {
       q: "How does response rate-limiting work?",
-      a: "Zenith Form enforces an in-memory rate limiter (5 submissions per minute per IP per form). IP addresses are salted and hashed using SHA-256 for privacy.",
+      a: "Zenith Form enforces an in-memory rate limiter (5 submissions per minute per IP per form). Submitter IP addresses are salted and hashed using SHA-256 for privacy.",
     },
     {
       q: "Can I export my form responses?",
@@ -117,14 +119,14 @@ export default async function Home() {
         {/* 1. HERO SECTION */}
         <section className="relative overflow-hidden pt-16 pb-20 md:pt-24 md:pb-28">
           
-          {/* Subtle Background Glow Accent */}
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+          {/* Ambient Background Glow Accents */}
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-tr from-primary/20 via-purple-500/10 to-indigo-500/20 blur-[130px] rounded-full pointer-events-none -z-10" />
 
           <div className="container max-w-6xl mx-auto px-4 text-center">
             
-            {/* Top Announcement Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary mb-8 shadow-sm">
-              <Sparkles className="h-3.5 w-3.5" />
+            {/* Announcement Pill Badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary mb-8 shadow-sm">
+              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
               <span>Full-Stack Typeform Alternative — Monorepo Architecture</span>
             </div>
 
@@ -141,26 +143,27 @@ export default async function Home() {
 
             {/* Action CTAs */}
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button asChild size="lg" className="w-full sm:w-auto h-12 px-8 text-base font-semibold shadow-md gap-2">
+              <Button asChild size="lg" className="w-full sm:w-auto h-12 px-8 text-base font-semibold shadow-lg gap-2">
                 <Link href="/login">
                   <span>Get Started Free</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
 
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 text-base font-medium">
-                <Link href="/#pricing">
-                  View Pricing & Plans
+              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 text-base font-medium border-border/80 gap-2">
+                <Link href="/explore">
+                  <Globe className="h-4 w-4" />
+                  <span>Explore Public Gallery</span>
                 </Link>
               </Button>
             </div>
 
-            {/* Backend Health Badge */}
-            <div className="mt-10 inline-flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 border border-border px-3.5 py-1.5 rounded-full">
+            {/* Backend Health Status Badge */}
+            <div className="mt-10 inline-flex items-center gap-2 text-xs text-muted-foreground bg-muted/60 border border-border/80 px-4 py-1.5 rounded-full shadow-sm">
               <Server className="h-3.5 w-3.5 text-muted-foreground" />
               <span>tRPC Backend Engine:</span>
               {serverStatus === "healthy" ? (
-                <span className="flex items-center gap-1 font-semibold text-emerald-500">
+                <span className="flex items-center gap-1.5 font-semibold text-emerald-500">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   Live & Healthy
                 </span>
@@ -173,52 +176,20 @@ export default async function Home() {
         </section>
 
         {/* 2. INTERACTIVE DEMO / PREVIEW MOCKUP SECTION */}
-        <section className="py-12 border-y border-border/40 bg-muted/20">
+        <section className="py-16 sm:py-20 border-y border-border/40 bg-muted/20">
           <div className="container max-w-5xl mx-auto px-4">
-            <div className="text-center mb-8">
-              <h2 className="text-sm uppercase tracking-widest font-semibold text-primary">Experience the UX</h2>
-              <p className="text-2xl font-bold mt-1">One question at a time. Clean & responsive.</p>
+            <div className="text-center mb-10 space-y-3">
+              <Badge variant="outline" className="px-3 py-1 font-semibold text-xs tracking-wider uppercase border-primary/30 text-primary">
+                Interactive Experience
+              </Badge>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Try Zenith Form in Action</h2>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-lg mx-auto">
+                Experience distraction-free single-question forms with live Zod validation, instant ratings, and real-time tRPC payload inspection.
+              </p>
             </div>
 
-            {/* Mock Typeform-style Card */}
-            <div className="max-w-2xl mx-auto rounded-2xl border border-border bg-card p-6 sm:p-10 shadow-xl relative overflow-hidden">
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-6">
-                <span className="font-medium text-primary">Question 2 of 4</span>
-                <div className="h-1.5 w-32 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-1/2 rounded-full" />
-                </div>
-              </div>
-
-              <h3 className="text-xl sm:text-2xl font-semibold mb-3">
-                How would you rate your product experience today?
-              </h3>
-              <p className="text-sm text-muted-foreground mb-6">Select one option below to continue.</p>
-
-              <div className="space-y-3">
-                {["😍 Exceptional — Loved every feature", "👍 Good — Met my expectations", "😐 Average — Could be improved"].map(
-                  (option, idx) => (
-                    <div
-                      key={idx}
-                      className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer ${
-                        idx === 0
-                          ? "border-primary bg-primary/5 font-medium"
-                          : "border-border hover:border-primary/50 hover:bg-accent/50"
-                      }`}
-                    >
-                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-muted text-xs font-semibold">
-                        {String.fromCharCode(65 + idx)}
-                      </span>
-                      <span className="text-sm">{option}</span>
-                    </div>
-                  )
-                )}
-              </div>
-
-              <div className="mt-8 flex justify-between items-center pt-4 border-t text-xs text-muted-foreground">
-                <span>Press <strong>Enter ↵</strong> to submit</span>
-                <Button size="sm" className="h-9 px-4">Next →</Button>
-              </div>
-            </div>
+            {/* Interactive Form Component */}
+            <InteractiveDemo />
           </div>
         </section>
 
@@ -227,7 +198,7 @@ export default async function Home() {
           <div className="container max-w-6xl mx-auto px-4">
             
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <Badge variant="outline" className="mb-3 px-3 py-1">Technical Architecture</Badge>
+              <Badge variant="outline" className="mb-3 px-3 py-1 font-semibold">Technical Architecture</Badge>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
                 Engineered for depth, speed & data integrity
               </h2>
@@ -239,49 +210,49 @@ export default async function Home() {
             {/* Grid of 4 Feature Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              <Card className="border-border/60 hover:border-primary/40 transition-all shadow-sm">
+              <Card className="border-border/60 hover:border-primary/40 transition-all duration-200 shadow-sm hover:shadow-md">
                 <CardHeader>
                   <div className="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-2">
                     <Zap className="h-5 w-5" />
                   </div>
                   <CardTitle className="text-xl">End-to-End Type Safety</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm leading-relaxed">
                     Powered by tRPC & Zod across the Turborepo monorepo. Every input contract is strictly validated between Next.js and Express.
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="border-border/60 hover:border-primary/40 transition-all shadow-sm">
+              <Card className="border-border/60 hover:border-primary/40 transition-all duration-200 shadow-sm hover:shadow-md">
                 <CardHeader>
                   <div className="h-10 w-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-2">
                     <Layers className="h-5 w-5" />
                   </div>
                   <CardTitle className="text-xl">Dynamic JSONB Schema</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm leading-relaxed">
                     Custom form fields and answers are stored using PostgreSQL JSONB with Drizzle ORM, allowing flexible schema building without runtime migrations.
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="border-border/60 hover:border-primary/40 transition-all shadow-sm">
+              <Card className="border-border/60 hover:border-primary/40 transition-all duration-200 shadow-sm hover:shadow-md">
                 <CardHeader>
                   <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-2">
                     <ShieldCheck className="h-5 w-5" />
                   </div>
                   <CardTitle className="text-xl">Privacy-First Salted Hashing</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm leading-relaxed">
                     Submitter IP addresses are salted and hashed before storage for spam prevention and rate-limiting without storing raw personal IP logs.
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="border-border/60 hover:border-primary/40 transition-all shadow-sm">
+              <Card className="border-border/60 hover:border-primary/40 transition-all duration-200 shadow-sm hover:shadow-md">
                 <CardHeader>
                   <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-2">
                     <BarChart3 className="h-5 w-5" />
                   </div>
                   <CardTitle className="text-xl">Automated Field Analytics</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm leading-relaxed">
                     Calculates option distributions for multiple choice, ratings average, and response counts per field out-of-the-box.
                   </CardDescription>
                 </CardHeader>
@@ -427,6 +398,11 @@ export default async function Home() {
                 <li>
                   <Link href="/#features" className="hover:text-foreground transition-colors">
                     Core Features
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/explore" className="hover:text-foreground transition-colors">
+                    Public Gallery
                   </Link>
                 </li>
                 <li>

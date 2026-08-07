@@ -227,7 +227,14 @@ export default function PublicFormPage() {
             />
           </div>
 
-          <Card className={`p-6 sm:p-10 space-y-6 ${themeConfig.cardClass}`}>
+          <Card className={`p-6 sm:p-10 space-y-6 relative overflow-hidden ${themeConfig.cardClass}`}>
+            {submitMutation.isPending && (
+              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-20 space-y-3 animate-in fade-in duration-200">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm font-semibold">Submitting Response...</p>
+              </div>
+            )}
+            <div className="relative z-10 space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className={`flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold ${themeConfig.badgeBg}`}>
@@ -435,7 +442,8 @@ export default function PublicFormPage() {
                 </Button>
               )}
             </div>
-          </Card>
+          </div>
+        </Card>
         </div>
       </main>
 
