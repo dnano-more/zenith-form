@@ -208,27 +208,32 @@ export function InteractiveDemo() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto rounded-3xl border border-border/80 bg-card shadow-2xl overflow-hidden relative transition-all duration-300">
+    <div className="max-w-3xl mx-auto rounded-3xl border border-border/80 bg-card shadow-2xl overflow-hidden relative transition-all duration-300 ring-1 ring-white/10">
       
-      {/* Top Glass Header & Mode Switcher Bar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 bg-muted/40 backdrop-blur-md">
+      {/* Simulated Browser Window Top Bar */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-border/60 bg-muted/60 backdrop-blur-md">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Zap className="h-4 w-4 fill-primary" />
+          {/* Window Control Dots */}
+          <div className="flex items-center gap-1.5 mr-2">
+            <span className="h-3 w-3 rounded-full bg-rose-500/80 inline-block shadow-sm" />
+            <span className="h-3 w-3 rounded-full bg-amber-500/80 inline-block shadow-sm" />
+            <span className="h-3 w-3 rounded-full bg-emerald-500/80 inline-block shadow-sm" />
           </div>
-          <span className="text-sm font-bold tracking-tight">Interactive Zenith Demo</span>
-          <Badge variant="outline" className="text-[10px] px-2 py-0.5 font-medium border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10">
-            Live Preview
-          </Badge>
+
+          {/* URL Bar Mock */}
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-xl bg-background/80 border border-border/60 text-[11px] font-mono text-muted-foreground shadow-inner">
+            <Lock className="h-3 w-3 text-emerald-500" />
+            <span>https://zenithform.app/demo/preview</span>
+          </div>
         </div>
 
         {/* Tab Switcher: Demo Form vs Real-Time Inspector */}
-        <div className="flex items-center bg-background/80 p-1 rounded-xl border border-border/60">
+        <div className="flex items-center bg-background/90 p-1 rounded-xl border border-border/60">
           <button
             onClick={() => setViewMode("demo")}
             className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
               viewMode === "demo"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-indigo-600 text-white shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -240,7 +245,7 @@ export function InteractiveDemo() {
             onClick={() => setViewMode("inspector")}
             className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
               viewMode === "inspector"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-indigo-600 text-white shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -254,7 +259,7 @@ export function InteractiveDemo() {
       <div className="p-6 sm:p-10 relative">
 
         {/* Subtle Ambient Glow */}
-        <div className="absolute -top-24 -right-24 w-60 h-60 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* MODE 1: INTERACTIVE FORM VIEW */}
@@ -309,7 +314,7 @@ export function InteractiveDemo() {
                     <RotateCcw className="h-4 w-4" />
                     <span>Try Demo Again</span>
                   </Button>
-                  <Button onClick={() => setViewMode("inspector")} className="gap-2 font-semibold h-11 px-6 rounded-xl">
+                  <Button onClick={() => setViewMode("inspector")} className="gap-2 font-semibold h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white">
                     <BarChart3 className="h-4 w-4" />
                     <span>Inspect Backend Payload</span>
                   </Button>
@@ -322,7 +327,7 @@ export function InteractiveDemo() {
                 {/* Progress Bar & Counter Header */}
                 <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                    <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
                     <span className="text-foreground font-bold">Question {currentStep + 1}</span>
                     <span className="text-muted-foreground font-normal">of {totalQuestions}</span>
                   </div>
@@ -331,7 +336,7 @@ export function InteractiveDemo() {
                     <span className="text-[11px] font-mono text-muted-foreground">{Math.round(progressPercent)}%</span>
                     <div className="h-2 w-32 bg-muted rounded-full overflow-hidden p-0.5">
                       <div
-                        className="h-full bg-gradient-to-r from-primary via-purple-500 to-indigo-500 rounded-full transition-all duration-500 ease-out"
+                        className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-500 ease-out"
                         style={{ width: `${progressPercent}%` }}
                       />
                     </div>
@@ -361,16 +366,16 @@ export function InteractiveDemo() {
                           onClick={() => setSelectedChoice(idx)}
                           className={`flex items-center justify-between p-4 rounded-2xl border text-sm transition-all duration-200 cursor-pointer select-none group ${
                             isSelected
-                              ? "border-primary bg-primary/10 text-foreground shadow-md ring-1 ring-primary/40"
-                              : "border-border/80 bg-background/50 hover:border-primary/50 hover:bg-accent/40 text-muted-foreground hover:text-foreground"
+                              ? "border-indigo-500 bg-indigo-500/15 text-foreground shadow-lg ring-2 ring-indigo-500/40 dark:bg-indigo-500/20"
+                              : "border-border/80 bg-background/50 hover:border-indigo-500/50 hover:bg-accent/60 hover:shadow-md hover:-translate-y-0.5 text-muted-foreground hover:text-foreground"
                           }`}
                         >
                           <div className="flex items-center gap-3.5">
                             <span
                               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold transition-all ${
                                 isSelected
-                                  ? "bg-primary text-primary-foreground scale-105"
-                                  : "bg-muted text-muted-foreground group-hover:bg-primary/20 group-hover:text-foreground"
+                                  ? "bg-indigo-600 text-white scale-105 shadow-sm"
+                                  : "bg-muted text-muted-foreground group-hover:bg-indigo-500/20 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
                               }`}
                             >
                               {letter}
@@ -385,8 +390,8 @@ export function InteractiveDemo() {
                           </div>
 
                           {isSelected && (
-                            <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0">
-                              <Check className="h-3.5 w-3.5" />
+                            <div className="h-6 w-6 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                              <Check className="h-3.5 w-3.5 stroke-[3]" />
                             </div>
                           )}
                         </div>

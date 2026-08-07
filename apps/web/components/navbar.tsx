@@ -29,12 +29,18 @@ export function Navbar({ minimal = false }: NavbarProps) {
         {/* Navigation Links */}
         {!minimal && (
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            <Link href="/#features" className="hover:text-foreground transition-colors">
+            <a href="#demo" className="hover:text-foreground transition-colors">
+              Demo
+            </a>
+            <a href="#features" className="hover:text-foreground transition-colors">
               Features
-            </Link>
-            <Link href="/#pricing" className="hover:text-foreground transition-colors">
+            </a>
+            <a href="#architecture" className="hover:text-foreground transition-colors">
+              Architecture
+            </a>
+            <a href="#pricing" className="hover:text-foreground transition-colors">
               Pricing
-            </Link>
+            </a>
             <a
               href="http://localhost:8000/docs"
               target="_blank"
