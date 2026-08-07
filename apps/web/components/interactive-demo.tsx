@@ -180,10 +180,16 @@ export function InteractiveDemo() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentStep, selectedChoice, rating, inputText, viewMode, isCompleted]);
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Construct current payload JSON string for inspector mode
   const payloadData = {
     formId: "demo-live-preview-01",
-    timestamp: new Date().toISOString(),
+    timestamp: mounted ? new Date().toISOString() : "2026-08-07T12:00:00.000Z",
     answers: {
       goalChoice: selectedChoice !== null ? SAMPLE_QUESTIONS[0]?.options?.[selectedChoice]?.label ?? null : null,
       ratingScore: rating > 0 ? `${rating}/5 Stars` : null,
