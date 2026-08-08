@@ -13,8 +13,16 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Zenith Form",
-  description: "Typeform-style form builder SaaS",
+  title: "Zenith Form — Next-Gen Interactive Form Builder",
+  description: "Distraction-free, high-converting form builder engineered for modern creators and developers with end-to-end type safety.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: "/icon.svg",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({
