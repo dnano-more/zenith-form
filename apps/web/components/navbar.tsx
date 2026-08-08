@@ -1,3 +1,6 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
@@ -9,10 +12,28 @@ interface NavbarProps {
 }
 
 export function Navbar({ minimal = false }: NavbarProps) {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-8">
-        
+    <header className="sticky top-0 z-50 w-full px-4 transition-all duration-300 pointer-events-none">
+      <div
+        className={`mx-auto flex items-center justify-between pointer-events-auto transition-all duration-300 ease-in-out ${
+          isScrolled
+            ? "max-w-5xl rounded-full mt-3 px-6 py-2.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800 shadow-md"
+            : "w-full max-w-7xl border-b border-transparent mt-0 py-4 px-4 sm:px-8 bg-transparent shadow-none"
+        }`}
+      >
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight hover:opacity-90 transition-opacity">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
@@ -29,16 +50,13 @@ export function Navbar({ minimal = false }: NavbarProps) {
         {/* Navigation Links */}
         {!minimal && (
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            <a href="#demo" className="hover:text-foreground transition-colors">
-              Demo
-            </a>
-            <a href="#features" className="hover:text-foreground transition-colors">
+            <a href="/#features" className="hover:text-foreground transition-colors">
               Features
             </a>
-            <a href="#architecture" className="hover:text-foreground transition-colors">
-              Architecture
-            </a>
-            <a href="#pricing" className="hover:text-foreground transition-colors">
+            <Link href="/explore" className="hover:text-foreground transition-colors">
+              Explore
+            </Link>
+            <a href="/#pricing" className="hover:text-foreground transition-colors">
               Pricing
             </a>
             <a
@@ -63,7 +81,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
                   Sign In
                 </Link>
               </Button>
-              <Button asChild size="sm" className="font-medium shadow-sm">
+              <Button asChild size="sm" className="font-medium shadow-sm rounded-xl">
                 <Link href="/login">
                   Get Started Free
                 </Link>

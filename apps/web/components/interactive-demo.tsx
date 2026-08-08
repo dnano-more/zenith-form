@@ -214,7 +214,7 @@ export function InteractiveDemo() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto rounded-3xl border border-border/80 bg-card shadow-2xl overflow-hidden relative transition-all duration-300 ring-1 ring-white/10">
+    <div className="max-w-3xl mx-auto rounded-3xl border border-zinc-200 shadow-xl dark:border-zinc-800 bg-card overflow-hidden relative transition-all duration-300 ring-1 ring-white/10">
       
       {/* Simulated Browser Window Top Bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border/60 bg-muted/60 backdrop-blur-md">

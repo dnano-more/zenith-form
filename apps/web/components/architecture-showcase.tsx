@@ -124,7 +124,7 @@ export function ArchitectureShowcase() {
                   <Badge variant="outline" className="text-[10px]">tRPC v11 Engine</Badge>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Defines end-to-end type-safe API procedures (`form.create`, `form.submitResponse`, `form.getAnalytics`).
+                  Defines end-to-end type-safe API procedures (<code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono text-foreground border border-border/50">form.create</code>, <code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono text-foreground border border-border/50">form.submitResponse</code>, <code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono text-foreground border border-border/50">form.getAnalytics</code>).
                 </p>
               </div>
 
@@ -134,7 +134,7 @@ export function ArchitectureShowcase() {
                   <Badge variant="outline" className="text-[10px]">Drizzle ORM + Postgres</Badge>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Contains relational database schemas (`forms`, `questions`, `responses`) with TypeScript type inference.
+                  Contains relational database schemas (<code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono text-foreground border border-border/50">forms</code>, <code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono text-foreground border border-border/50">questions</code>, <code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono text-foreground border border-border/50">responses</code>) with TypeScript type inference.
                 </p>
               </div>
 
@@ -152,7 +152,7 @@ export function ArchitectureShowcase() {
             <div className="p-4 rounded-2xl border-l-4 border-purple-500 bg-purple-500/10 text-xs text-muted-foreground flex items-center gap-3 shadow-sm">
               <CheckCircle2 className="h-5 w-5 text-purple-500 shrink-0" />
               <span>
-                <strong className="text-foreground">Architecture Note:</strong> Zero code duplication between client & server. Any type change in Zod schema triggers instant TypeScript type-checking across the entire monorepo.
+                <strong className="text-foreground">Engineering Advantage:</strong> Zero code duplication between client & server. Any type change in Zod schema triggers instant TypeScript type-checking across the entire monorepo.
               </span>
             </div>
           </div>
@@ -275,7 +275,7 @@ if (rateLimiter.isExceeded(saltedHash)) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="p-3.5 rounded-xl border border-border/60 bg-card space-y-1">
                 <div className="font-semibold text-foreground">OpenAPI JSON Spec</div>
-                <p className="text-muted-foreground">Available at `/openapi.json` for Client SDK generation.</p>
+                <p className="text-muted-foreground">Available at <code className="bg-muted px-1 py-0.5 rounded text-[11px] font-mono text-foreground border border-border/50">/openapi.json</code> for Client SDK generation.</p>
               </div>
 
               <div className="p-3.5 rounded-xl border border-border/60 bg-card space-y-1">

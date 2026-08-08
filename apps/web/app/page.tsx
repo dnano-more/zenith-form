@@ -31,6 +31,8 @@ import {
   CheckCircle2,
   FileCode2,
   Activity,
+  Github,
+  Terminal,
 } from "lucide-react";
 
 export default async function Home() {
@@ -134,8 +136,8 @@ export default async function Home() {
 
   const faqs = [
     {
-      q: "Is Zenith Form built for full-stack engineering portfolios?",
-      a: "Yes! Zenith Form is engineered to demonstrate senior full-stack standards: Turborepo monorepo architecture, end-to-end Zod + tRPC type-safety, PostgreSQL JSONB with Drizzle ORM, and salted IP privacy protection.",
+      q: "What makes Zenith Form different from traditional form builders?",
+      a: "Zenith Form is engineered for high performance and security. It combines end-to-end Zod + tRPC type-safety, dynamic PostgreSQL JSONB storage with Drizzle ORM, and privacy-first salted IP rate limiting.",
     },
     {
       q: "How does response rate-limiting work?",
@@ -143,7 +145,7 @@ export default async function Home() {
     },
     {
       q: "Can I inspect the OpenAPI 3.0 & Scalar API docs?",
-      a: "Yes! Our Express backend automatically generates OpenAPI 3.0 documentation and serves interactive Scalar API reference at http://localhost:8000/docs.",
+      a: "Yes! Zenith Form automatically generates interactive OpenAPI 3.0 specifications and Scalar API documentation so you can easily integrate form payloads into your own backend workflows.",
     },
     {
       q: "Can I export my form responses?",
@@ -152,7 +154,7 @@ export default async function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background font-sans antialiased">
+    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-background font-sans antialiased text-foreground selection:bg-indigo-500 selection:text-white">
       {/* Top Navigation */}
       <Navbar />
 
@@ -160,17 +162,17 @@ export default async function Home() {
       <main className="flex-1">
         
         {/* 1. HERO SECTION */}
-        <section className="relative overflow-hidden pt-16 pb-16 md:pt-24 md:pb-20">
+        <section className="relative overflow-hidden pt-16 pb-16 md:pt-24 md:pb-20 bg-zinc-50 dark:bg-background">
           
           {/* Floating Subtle Radial Gradient Glow Behind Hero Heading */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 blur-[120px] rounded-full pointer-events-none -z-10 animate-float-slow" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[380px] bg-gradient-to-r from-purple-200/50 via-indigo-200/50 to-pink-200/50 dark:from-indigo-500/20 dark:via-purple-500/20 dark:to-pink-500/20 blur-[130px] rounded-full pointer-events-none -z-10 animate-float-slow" />
 
           <div className="container max-w-6xl mx-auto px-4 text-center relative z-10">
             
             {/* Announcement Badge */}
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary mb-8 shadow-sm animate-fade-in-up">
               <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              <span>Next-Gen Interactive Form Builder — Full-Stack Monorepo</span>
+              <span>Next-Gen Interactive Form Builder — High Conversion & Type-Safe</span>
             </div>
 
             {/* Main Headline */}
@@ -222,7 +224,7 @@ export default async function Home() {
         </section>
 
         {/* 2. TECHNICAL METRICS & ENGINEERING BENCHMARKS GRID */}
-        <section className="py-12 border-y border-border/40 bg-card/50 backdrop-blur-sm">
+        <section className="py-12 border-y border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-900/40 backdrop-blur-sm shadow-sm">
           <div className="container max-w-6xl mx-auto px-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
               {metrics.map((m, idx) => {
@@ -230,7 +232,7 @@ export default async function Home() {
                 return (
                   <div
                     key={idx}
-                    className="p-5 rounded-2xl border border-white/10 dark:border-white/10 border-border/80 bg-muted/20 space-y-2 transition-all duration-300 hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-0.5"
+                    className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-muted/20 space-y-2 transition-all duration-300 hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-0.5"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{m.label}</span>
@@ -250,8 +252,9 @@ export default async function Home() {
         </section>
 
         {/* 3. INTERACTIVE DEMO SECTION */}
-        <section id="demo" className="py-16 sm:py-20 bg-muted/20">
-          <div className="container max-w-5xl mx-auto px-4">
+        <section id="demo" className="py-16 sm:py-20 bg-zinc-100/70 dark:bg-zinc-900/30 border-b border-zinc-200/60 dark:border-zinc-800/60 relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-indigo-100/40 dark:bg-indigo-900/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+          <div className="container max-w-5xl mx-auto px-4 relative z-10">
             <div className="text-center mb-10 space-y-3">
               <Badge variant="outline" className="px-3 py-1 font-semibold text-xs tracking-wider uppercase border-indigo-500/30 text-indigo-600 dark:text-indigo-400">
                 Interactive Form Engine
@@ -268,8 +271,8 @@ export default async function Home() {
         </section>
 
         {/* 4. ARCHITECTURE SHOWCASE SECTION */}
-        <section id="architecture" className="py-20 border-t border-border/40 bg-background">
-          <div className="container max-w-6xl mx-auto px-4">
+        <section id="architecture" className="py-20 border-t border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50 dark:bg-background relative overflow-hidden">
+          <div className="container max-w-6xl mx-auto px-4 relative z-10">
             
             <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
               <Badge variant="outline" className="px-3 py-1 font-semibold text-xs border-purple-500/30 text-purple-600 dark:text-purple-400">
@@ -289,56 +292,221 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* 5. FEATURE HIGHLIGHTS */}
-        <section id="features" className="py-16 border-y border-border/40 bg-muted/10">
-          <div className="container max-w-6xl mx-auto px-4">
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Engineered for Performance, Security & Scale</h3>
-              <p className="text-sm text-muted-foreground mt-2">Built for high availability, zero type-mismatch bugs, and seamless developer velocity.</p>
+        {/* 5. FEATURE HIGHLIGHTS - BENTO GRID */}
+        <section id="features" className="py-20 border-y border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/70 dark:bg-zinc-900/30 relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-purple-100/40 dark:bg-purple-900/10 blur-[140px] rounded-full pointer-events-none -z-10" />
+          <div className="container max-w-6xl mx-auto px-4 relative z-10">
+            
+            <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+              <Badge variant="outline" className="px-3 py-1 font-semibold text-xs border-indigo-500/30 text-indigo-600 dark:text-indigo-400">
+                Core Capabilities
+              </Badge>
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+                Engineered for Performance, Security & Scale
+              </h2>
+              <p className="text-base text-muted-foreground">
+                Built for high availability, zero type-mismatch bugs, and effortless form builder experience.
+              </p>
             </div>
 
+            {/* Bento Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="border-border/60 bg-card">
-                <CardHeader>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-500 mb-2">
-                    <CheckCircle2 className="h-5 w-5" />
+              
+              {/* CARD 1: VISUAL FORM BUILDER (Span 2 cols) */}
+              <div className="md:col-span-2 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/5 group relative overflow-hidden shadow-sm">
+                <div className="space-y-3 mb-6 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500">
+                      <FormInput className="h-5 w-5" />
+                    </div>
+                    <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
+                      Dynamic Builder UI
+                    </Badge>
                   </div>
-                  <CardTitle className="text-lg">End-to-End Type Safety</CardTitle>
-                  <CardDescription className="text-xs leading-relaxed">
-                    Shared `@repo/trpc` and `@repo/db` packages protect data contracts from client forms to server handlers without runtime type errors.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+                  <h3 className="text-2xl font-bold tracking-tight">Visual Form Builder</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xl">
+                    Create distraction-free, single-question forms with interactive field creation, real-time preview, drag-and-drop ordering, and validation rules.
+                  </p>
+                </div>
 
-              <Card className="border-border/60 bg-card">
-                <CardHeader>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 mb-2">
-                    <Lock className="h-5 w-5" />
+                {/* Sleek UI Mockup */}
+                <div className="rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/40 p-4 sm:p-5 space-y-3 relative z-10 backdrop-blur-sm shadow-inner">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground pb-2 border-b border-border/60">
+                    <div className="flex items-center gap-1.5 font-medium">
+                      <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
+                      <span>Form Field Canvas</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Badge variant="outline" className="text-[10px] bg-background">Required</Badge>
+                      <Badge variant="outline" className="text-[10px] bg-indigo-500/10 text-indigo-500 border-indigo-500/30">Single Select</Badge>
+                    </div>
                   </div>
-                  <CardTitle className="text-lg">GDPR-Compliant Protection</CardTitle>
-                  <CardDescription className="text-xs leading-relaxed">
-                    Salted SHA-256 IP rate limiting protects against form submission spam while keeping user PII 100% private.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
 
-              <Card className="border-border/60 bg-card">
-                <CardHeader>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 mb-2">
-                    <FileCode2 className="h-5 w-5" />
+                  <div className="space-y-2">
+                    <div className="text-xs font-semibold text-foreground">
+                      Question 1: What is your primary engineering stack?
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                      <div className="p-2.5 rounded-xl border border-indigo-500/80 bg-indigo-500/10 font-medium text-foreground flex items-center justify-between shadow-sm">
+                        <span>⚡ Next.js + tRPC</span>
+                        <Check className="h-3.5 w-3.5 text-indigo-500 stroke-[3]" />
+                      </div>
+                      <div className="p-2.5 rounded-xl border border-border/60 bg-background/60 text-muted-foreground hover:text-foreground transition-colors flex items-center justify-between">
+                        <span>🚀 React + REST API</span>
+                      </div>
+                      <div className="p-2.5 rounded-xl border border-border/60 bg-background/60 text-muted-foreground hover:text-foreground transition-colors flex items-center justify-between">
+                        <span>🛡️ Full-Stack Vue</span>
+                      </div>
+                    </div>
                   </div>
-                  <CardTitle className="text-lg">Interactive OpenAPI 3.0 Specs</CardTitle>
-                  <CardDescription className="text-xs leading-relaxed">
-                    Auto-generated Scalar API reference documentation allows effortless REST integration and client SDK generation.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+                </div>
+
+                {/* Glow Background Gradient */}
+                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all pointer-events-none" />
+              </div>
+
+              {/* CARD 2: FULL-STACK TYPE SAFETY (Span 1 col) */}
+              <div className="md:col-span-1 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-purple-500/40 hover:shadow-xl hover:shadow-purple-500/5 group relative overflow-hidden shadow-sm">
+                <div className="space-y-3 mb-6 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500">
+                      <Code2 className="h-5 w-5" />
+                    </div>
+                    <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
+                      Zod + tRPC
+                    </Badge>
+                  </div>
+                  <h3 className="text-xl font-bold tracking-tight">Full-Stack Type Safety</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Shared schemas across `@repo/trpc` ensure 100% type contract match from client forms to server handlers.
+                  </p>
+                </div>
+
+                {/* Styled Code Snippet Window */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 font-mono text-[11px] leading-relaxed text-slate-300 overflow-x-auto shadow-inner relative z-10">
+                  <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-[10px] text-muted-foreground">
+                    <span>schema.ts</span>
+                    <span className="text-purple-400">Zod v4</span>
+                  </div>
+                  <pre>
+                    <span className="text-purple-400">const</span> <span className="text-blue-300">fieldSchema</span> = <span className="text-emerald-400">z</span>.object(&#123;{"\n"}
+                    {"  "}<span className="text-slate-300">id:</span> <span className="text-emerald-400">z</span>.string().uuid(),{"\n"}
+                    {"  "}<span className="text-slate-300">label:</span> <span className="text-emerald-400">z</span>.string().min(<span className="text-amber-400">2</span>),{"\n"}
+                    {"  "}<span className="text-slate-300">type:</span> <span className="text-emerald-400">z</span>.enum([<span className="text-amber-300">&quot;choice&quot;</span>, <span className="text-amber-300">&quot;rating&quot;</span>]),{"\n"}
+                    &#125;);
+                  </pre>
+                </div>
+
+                {/* Glow Background Gradient */}
+                <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all pointer-events-none" />
+              </div>
+
+              {/* CARD 3: REAL-TIME RESPONSE ANALYTICS (Span 1 col) */}
+              <div className="md:col-span-1 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-amber-500/40 hover:shadow-xl hover:shadow-amber-500/5 group relative overflow-hidden shadow-sm">
+                <div className="space-y-3 mb-6 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
+                      <BarChart3 className="h-5 w-5" />
+                    </div>
+                    <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
+                      Live Metrics
+                    </Badge>
+                  </div>
+                  <h3 className="text-xl font-bold tracking-tight">Real-Time Analytics</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Track submission velocity, drop-off rates, and field aggregates with zero latency overhead.
+                  </p>
+                </div>
+
+                {/* Mini Chart & Progress Metrics */}
+                <div className="rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/30 p-4 space-y-3 relative z-10 backdrop-blur-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Completion Rate</span>
+                    <span className="text-sm font-extrabold text-amber-500 font-mono">94.2%</span>
+                  </div>
+
+                  <div className="space-y-2 text-[11px]">
+                    <div>
+                      <div className="flex justify-between text-muted-foreground mb-1">
+                        <span>Q1: Goal Selection</span>
+                        <span className="font-semibold text-foreground">98%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                        <div className="h-full bg-amber-500 rounded-full w-[98%]" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-muted-foreground mb-1">
+                        <span>Q2: Speed Rating</span>
+                        <span className="font-semibold text-foreground">94%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                        <div className="h-full bg-amber-500 rounded-full w-[94%]" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Glow Background Gradient */}
+                <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all pointer-events-none" />
+              </div>
+
+              {/* CARD 4: PRIVACY-FIRST RATE LIMITING (Span 2 cols) */}
+              <div className="md:col-span-2 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/5 group relative overflow-hidden shadow-sm">
+                <div className="space-y-3 mb-6 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+                      <ShieldCheck className="h-5 w-5" />
+                    </div>
+                    <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
+                      GDPR & Spam Protection
+                    </Badge>
+                  </div>
+                  <h3 className="text-2xl font-bold tracking-tight">Privacy-First Rate Limiting</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xl">
+                    In-memory sliding window rate limiter protects forms against DDoS and submission spam using SHA-256 salted IP hashes without ever storing raw PII data.
+                  </p>
+                </div>
+
+                {/* Security Pipeline Visual */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 relative z-10 text-xs">
+                  <div className="p-3.5 rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/40 space-y-1">
+                    <div className="font-semibold text-foreground flex items-center gap-1.5">
+                      <Zap className="h-3.5 w-3.5 text-amber-500" />
+                      <span>5 req / min Limit</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">Sliding window algorithm prevents spam attacks.</p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 space-y-1">
+                    <div className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                      <Lock className="h-3.5 w-3.5 text-emerald-500" />
+                      <span>Salted SHA-256</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">Submitter IP is irreversibly hashed before storage.</p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/40 space-y-1">
+                    <div className="font-semibold text-foreground flex items-center gap-1.5">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-blue-500" />
+                      <span>0% PII Storage</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">Full compliance with privacy standards and GDPR.</p>
+                  </div>
+                </div>
+
+                {/* Glow Background Gradient */}
+                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all pointer-events-none" />
+              </div>
+
             </div>
+
           </div>
         </section>
 
         {/* 6. PRICING SECTION */}
-        <section id="pricing" className="py-20">
+        <section id="pricing" className="py-20 bg-zinc-50 dark:bg-background">
           <div className="container max-w-6xl mx-auto px-4">
             
             {/* Header */}
@@ -361,8 +529,8 @@ export default async function Home() {
                   key={idx}
                   className={`flex flex-col justify-between relative transition-all duration-300 ${
                     tier.highlight
-                      ? "border-indigo-500/80 shadow-2xl ring-2 ring-indigo-500/30 bg-card scale-[1.03] z-10"
-                      : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm"
+                      ? "border-indigo-500/80 shadow-2xl ring-2 ring-indigo-500/30 bg-white dark:bg-zinc-950 scale-[1.03] z-10"
+                      : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-950 shadow-sm"
                   }`}
                 >
                   {tier.highlight && (
@@ -418,7 +586,7 @@ export default async function Home() {
             </div>
 
             {/* FAQ Section */}
-            <div className="max-w-3xl mx-auto border-t border-zinc-200 dark:border-zinc-800 pt-16">
+            <div className="max-w-3xl mx-auto border-t border-zinc-200/80 dark:border-zinc-800 pt-16">
               <div className="text-center mb-10">
                 <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2">
                   <HelpCircle className="h-4 w-4" />
@@ -432,7 +600,7 @@ export default async function Home() {
                   <AccordionItem
                     key={fIdx}
                     value={`item-${fIdx}`}
-                    className="border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-2xl px-5 py-1 bg-card transition-all duration-200 shadow-sm"
+                    className="border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-2xl px-5 py-1 bg-white dark:bg-zinc-950 transition-all duration-200 shadow-sm"
                   >
                     <AccordionTrigger className="text-left font-semibold text-base hover:no-underline">
                       {faq.q}
@@ -449,9 +617,9 @@ export default async function Home() {
         </section>
 
         {/* 7. BOTTOM SaaS CTA BANNER */}
-        <section className="py-20 border-t border-zinc-200 dark:border-zinc-800 bg-background">
+        <section className="py-20 border-t border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/70 dark:bg-zinc-900/30">
           <div className="container max-w-4xl mx-auto px-4">
-            <div className="rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-b from-indigo-500/10 via-purple-500/5 to-transparent p-8 sm:p-14 shadow-xl text-center space-y-6 relative overflow-hidden">
+            <div className="bg-white/70 dark:bg-zinc-900/60 backdrop-blur-xl border border-zinc-200/70 dark:border-zinc-800/70 shadow-2xl shadow-indigo-500/5 dark:shadow-none rounded-3xl p-8 md:p-12 text-center space-y-6 relative overflow-hidden">
               <Badge variant="secondary" className="px-3.5 py-1 text-xs font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
                 Production-Ready SaaS
               </Badge>
@@ -463,19 +631,23 @@ export default async function Home() {
               </p>
 
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button asChild size="lg" className="h-12 px-8 font-semibold shadow-lg gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl">
-                  <Link href="/login">
-                    <span>Launch Dashboard</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
+                <Link
+                  href="/login"
+                  className="bg-indigo-600/90 hover:bg-indigo-600 dark:bg-indigo-500/90 dark:hover:bg-indigo-500 text-white font-medium text-sm px-6 py-3 rounded-xl backdrop-blur-md border-t border-white/30 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 inline-flex items-center gap-2 group cursor-pointer"
+                >
+                  <span>Launch Dashboard</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
 
-                <Button asChild variant="outline" size="lg" className="h-12 px-8 font-medium gap-2 border-zinc-300 dark:border-zinc-700 rounded-xl">
-                  <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer">
-                    <FileCode2 className="h-4 w-4 text-amber-500" />
-                    <span>View API Docs</span>
-                  </a>
-                </Button>
+                <a
+                  href="http://localhost:8000/docs"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-white/60 dark:bg-zinc-800/40 backdrop-blur-md text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700/60 hover:bg-white/90 dark:hover:bg-zinc-800/80 font-medium text-sm px-6 py-3 rounded-xl transition-all duration-200 inline-flex items-center gap-2 shadow-sm cursor-pointer"
+                >
+                  <FileCode2 className="h-4 w-4 text-amber-500" />
+                  <span>View API Docs</span>
+                </a>
               </div>
             </div>
           </div>
@@ -484,7 +656,7 @@ export default async function Home() {
       </main>
 
       {/* Modern Professional Footer */}
-      <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-card text-card-foreground">
+      <footer className="border-t border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 text-card-foreground">
         <div className="container max-w-6xl mx-auto px-4 py-12 md:py-16">
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 mb-12">
@@ -498,7 +670,7 @@ export default async function Home() {
                 <span>Zenith Form</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                A full-stack Typeform-style form builder SaaS built with Turborepo, tRPC, Zod, and Drizzle ORM.
+                Distraction-free, high-converting form builder engineered for modern creators and developers.
               </p>
               <div className="pt-1">
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
@@ -515,7 +687,7 @@ export default async function Home() {
               </h4>
               <ul className="space-y-2.5 text-xs text-muted-foreground font-medium">
                 <li>
-                  <Link href="/#features" className="hover:text-foreground transition-colors">
+                  <Link href="/#architecture" className="hover:text-foreground transition-colors">
                     System Architecture
                   </Link>
                 </li>
@@ -565,6 +737,17 @@ export default async function Home() {
                   </a>
                 </li>
                 <li>
+                  <a
+                    href="https://github.com/dnano-more/zenith-form"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-foreground transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <Github className="h-3.5 w-3.5" />
+                    <span>GitHub Repository</span>
+                  </a>
+                </li>
+                <li>
                   <span className="text-muted-foreground/70">
                     tRPC Protected Procedures
                   </span>
@@ -591,7 +774,7 @@ export default async function Home() {
                   <Badge
                     key={tIdx}
                     variant="outline"
-                    className="text-[10px] font-normal py-0.5 px-2 bg-muted/30"
+                    className="text-[10px] font-normal py-0.5 px-2 bg-muted/30 hover:border-zinc-500 transition-colors cursor-default"
                   >
                     {tech}
                   </Badge>
@@ -605,7 +788,7 @@ export default async function Home() {
           <div className="border-t border-zinc-200 dark:border-zinc-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
             <p>© {new Date().getFullYear()} Zenith Form. All rights reserved.</p>
             <p className="text-[11px] text-muted-foreground/80">
-              Designed & Engineered for Technical Excellence & Portfolio Review.
+              Engineered for high performance & type-safe form delivery.
             </p>
           </div>
 
