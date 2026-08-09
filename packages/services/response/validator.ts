@@ -12,7 +12,7 @@ export interface ValidateAnswersResult {
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]{6,20}$/;
+const PHONE_REGEX = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./()0-9]{6,20}$/;
 
 function isEmpty(value: unknown): boolean {
   if (value === undefined || value === null) return true;
