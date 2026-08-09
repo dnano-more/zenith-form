@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { getApiDocsUrl } from "~/lib/utils";
 import {
   Code2,
   ShieldCheck,
@@ -261,11 +262,11 @@ if (rateLimiter.isExceeded(saltedHash)) {
             <div className="p-5 rounded-2xl border border-border/80 bg-muted/20 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="space-y-1 text-center sm:text-left">
                 <div className="text-sm font-bold text-foreground">Interactive Scalar API Docs</div>
-                <div className="text-xs text-muted-foreground font-mono">http://localhost:8000/docs</div>
+                <div className="text-xs text-muted-foreground font-mono">{getApiDocsUrl()}</div>
               </div>
 
               <Button asChild size="sm" className="gap-2 font-semibold">
-                <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer">
+                <a href={getApiDocsUrl()} target="_blank" rel="noreferrer">
                   <span>Explore Scalar Docs</span>
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>

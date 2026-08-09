@@ -12,6 +12,7 @@ import {
 import { InteractiveDemo } from "~/components/interactive-demo";
 import { ArchitectureShowcase } from "~/components/architecture-showcase";
 import { api } from "~/trpc/server";
+import { getApiDocsUrl, getOpenApiSpecUrl } from "~/lib/utils";
 import {
   ArrowRight,
   BarChart3,
@@ -640,7 +641,7 @@ export default async function Home() {
                 </Link>
 
                 <a
-                  href="http://localhost:8000/docs"
+                  href={getApiDocsUrl()}
                   target="_blank"
                   rel="noreferrer"
                   className="bg-white/60 dark:bg-zinc-800/40 backdrop-blur-md text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700/60 hover:bg-white/90 dark:hover:bg-zinc-800/80 font-medium text-sm px-6 py-3 rounded-xl transition-all duration-200 inline-flex items-center gap-2 shadow-sm cursor-pointer"
@@ -717,7 +718,7 @@ export default async function Home() {
               <ul className="space-y-2.5 text-xs text-muted-foreground font-medium">
                 <li>
                   <a
-                    href="http://localhost:8000/docs"
+                    href={getApiDocsUrl()}
                     target="_blank"
                     rel="noreferrer"
                     className="hover:text-foreground transition-colors inline-flex items-center gap-1"
@@ -728,7 +729,7 @@ export default async function Home() {
                 </li>
                 <li>
                   <a
-                    href="http://localhost:8000/openapi.json"
+                    href={getOpenApiSpecUrl()}
                     target="_blank"
                     rel="noreferrer"
                     className="hover:text-foreground transition-colors"

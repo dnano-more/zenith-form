@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { FormInput, Sparkles } from "lucide-react";
 import { ThemeToggle } from "~/components/theme-toggle";
+import { getApiDocsUrl } from "~/lib/utils";
 
 interface NavbarProps {
   minimal?: boolean;
@@ -60,7 +61,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
               Pricing
             </a>
             <a
-              href="http://localhost:8000/docs"
+              href={getApiDocsUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors flex items-center gap-1"
