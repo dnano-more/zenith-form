@@ -10,7 +10,7 @@ const getPath = generatePath("/authentication");
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: ["prod", "production"].includes(process.env.NODE_ENV ?? ""),
-  sameSite: "lax" as const,
+  sameSite: (["prod", "production"].includes(process.env.NODE_ENV ?? "") ? "none" : "lax") as "none" | "lax",
   path: "/",
 };
 
