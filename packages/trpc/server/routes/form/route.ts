@@ -129,7 +129,7 @@ export const formRouter = router({
     .output(z.object({ success: z.literal(true) }))
     .mutation(async ({ ctx }) => {
       try {
-        return await formService.seedSampleForms(ctx.user.userId);
+        return await formService.seedSampleForms(ctx.user.userId, ctx.user.email);
       } catch (error) {
         handleServiceError(error);
       }

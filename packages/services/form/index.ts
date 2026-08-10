@@ -1,6 +1,6 @@
 import { eq, and, desc, asc, sql } from "drizzle-orm";
 import { db } from "@repo/database";
-import { formsTable, formFieldsTable, formResponsesTable } from "@repo/database/schema";
+import { usersTable, formsTable, formFieldsTable, formResponsesTable } from "@repo/database/schema";
 import { generateSlug } from "../utils/slugify";
 import type { CreateFormInput, UpdateFormInput } from "./model";
 
@@ -194,14 +194,51 @@ export class FormService {
       .limit(20);
   }
 
-  public async seedSampleForms(creatorId: string) {
+  public async seedSampleForms(creatorId: string, userEmail?: string) {
     return await db.transaction(async (tx) => {
+      // Check if creator user exists in database to prevent Foreign Key crashes
+      const [existingUser] = await tx
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.id, creatorId))
+        .limit(1);
+
+      let targetCreatorId = creatorId;
+
+      if (!existingUser) {
+        const emailToFind = userEmail ?? "demo@zenithform.com";
+        const [userByEmail] = await tx
+          .select()
+          .from(usersTable)
+          .where(eq(usersTable.email, emailToFind))
+          .limit(1);
+
+        if (userByEmail) {
+          targetCreatorId = userByEmail.id;
+        } else {
+          const [newUser] = await tx
+            .insert(usersTable)
+            .values({
+              fullName: emailToFind === "demo@zenithform.com" ? "Demo Account" : "User",
+              email: emailToFind,
+              emailVerified: true,
+            })
+            .returning();
+
+          if (newUser) {
+            targetCreatorId = newUser.id;
+          } else {
+            throw new Error("USER_NOT_FOUND");
+          }
+        }
+      }
+
       // Form 1: Customer Feedback & Support
       const slug1 = generateSlug("Customer Feedback & Support");
       const [form1] = await tx
         .insert(formsTable)
         .values({
-          creatorId,
+          creatorId: targetCreatorId,
           title: "Customer Feedback & Support",
           description: "Pre-built sample form to collect customer satisfaction ratings and feedback.",
           theme: "cyber_neon",
@@ -218,7 +255,7 @@ export class FormService {
           .values([
             { formId: form1.id, type: "short_text", label: "Full Name", placeholder: "Jane Doe", required: true, order: 0 },
             { formId: form1.id, type: "email", label: "Email Address", placeholder: "jane@example.com", required: true, order: 1 },
-            { formId: form1.id, type: "phone", label: "Phone Number", placeholder: "+1 (555) 000-0000", required: false, order: 2 },
+            { formId: form1.id, type: "short_text", label: "Phone Number", placeholder: "+1 (555) 000-0000", required: false, order: 2 },
             { formId: form1.id, type: "rating", label: "Overall Satisfaction Rating", required: true, order: 3 },
             { formId: form1.id, type: "single_select", label: "Would you recommend our product?", options: ["Definitely", "Maybe", "Not likely"], required: true, order: 4 },
             { formId: form1.id, type: "long_text", label: "Detailed Feedback & Suggestions", placeholder: "Share your detailed thoughts...", required: false, order: 5 },
@@ -276,7 +313,7 @@ export class FormService {
       const [form2] = await tx
         .insert(formsTable)
         .values({
-          creatorId,
+          creatorId: targetCreatorId,
           title: "Product Launch Event Registration",
           description: "Pre-built registration form for upcoming live launch events.",
           theme: "emerald",
