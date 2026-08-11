@@ -1,4 +1,4 @@
-import { eq, and, desc, asc, sql } from "drizzle-orm";
+import { eq, and, not, like, desc, asc, sql } from "drizzle-orm";
 import { db } from "@repo/database";
 import { usersTable, formsTable, formFieldsTable, formResponsesTable } from "@repo/database/schema";
 import { generateSlug } from "../utils/slugify";
@@ -187,8 +187,16 @@ export class FormService {
         responseCount: sql<number>`count(${formResponsesTable.id})::int`,
       })
       .from(formsTable)
+      .leftJoin(usersTable, eq(usersTable.id, formsTable.creatorId))
       .leftJoin(formResponsesTable, eq(formResponsesTable.formId, formsTable.id))
-      .where(eq(formsTable.status, "published"))
+      .where(
+        and(
+          eq(formsTable.status, "published"),
+          eq(formsTable.visibility, "public"),
+          not(like(usersTable.email, "demo%")),
+          not(like(usersTable.email, "%@zenithform.com"))
+        )
+      )
       .groupBy(formsTable.id)
       .orderBy(desc(formsTable.createdAt))
       .limit(20);
@@ -242,7 +250,7 @@ export class FormService {
           title: "Customer Feedback & Support",
           description: "Pre-built sample form to collect customer satisfaction ratings and feedback.",
           theme: "cyber_neon",
-          visibility: "public",
+          visibility: "unlisted",
           status: "published",
           slug: slug1,
           publishedAt: new Date(),
@@ -317,7 +325,7 @@ export class FormService {
           title: "Product Launch Event Registration",
           description: "Pre-built registration form for upcoming live launch events.",
           theme: "emerald",
-          visibility: "public",
+          visibility: "unlisted",
           status: "published",
           slug: slug2,
           publishedAt: new Date(),
