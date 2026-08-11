@@ -1,0 +1,1 @@
+ALTER TYPE "public"."field_type" ADD VALUE 'phone' BEFORE 'single_select';
