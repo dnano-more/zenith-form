@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { eq } from "drizzle-orm";
 import { db } from "@repo/database";
 import { usersTable } from "@repo/database/schema";
@@ -5,11 +6,7 @@ import { signSessionToken } from "../auth/jwt";
 import { env } from "../env";
 import { googleOAuth2Client } from "../clients/google-oauth";
 import { GetAuthenticationMethodOutputSchema } from "./model";
-import FormService from "../form";
 
-const formService = new FormService();
-
-const GUEST_EMAIL = "demo@zenithform.com";
 const GUEST_NAME = "Demo User";
 
 class UserService {
@@ -90,38 +87,20 @@ class UserService {
   }
 
   public async loginAsGuest() {
-    const [existingGuest] = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.email, GUEST_EMAIL))
-      .limit(1);
+    const randomSuffix = randomBytes(4).toString("hex");
+    const guestEmail = `demo-${randomSuffix}@zenithform.com`;
 
-    const isNewGuest = !existingGuest;
-
-    const guestUser =
-      existingGuest ??
-      (
-        await db
-          .insert(usersTable)
-          .values({
-            fullName: GUEST_NAME,
-            email: GUEST_EMAIL,
-            emailVerified: true,
-          })
-          .returning()
-      )[0];
+    const [guestUser] = await db
+      .insert(usersTable)
+      .values({
+        fullName: GUEST_NAME,
+        email: guestEmail,
+        emailVerified: true,
+      })
+      .returning();
 
     if (!guestUser) {
       throw new Error("Failed to create guest user");
-    }
-
-    // Auto-seed sample forms ONLY for demo/guest account creation
-    if (isNewGuest) {
-      try {
-        await formService.seedSampleForms(guestUser.id);
-      } catch {
-        // Ignore seeding errors silently during guest login
-      }
     }
 
     const sessionToken = signSessionToken({

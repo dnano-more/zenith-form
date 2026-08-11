@@ -63,7 +63,7 @@ export default function DashboardPage() {
   const { data: me } = trpc.user.whoAmI.useQuery();
   const { data: forms, isLoading } = trpc.form.getMyForms.useQuery();
 
-  const isDemoUser = me?.email === "demo@zenithform.com";
+  const isDemoUser = Boolean(me?.email && (me.email.startsWith("demo") || me.email.endsWith("@zenithform.com")));
 
   // Create form mutation
   const createFormMutation = trpc.form.createForm.useMutation({

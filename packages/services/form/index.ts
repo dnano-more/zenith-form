@@ -219,7 +219,7 @@ export class FormService {
           const [newUser] = await tx
             .insert(usersTable)
             .values({
-              fullName: emailToFind === "demo@zenithform.com" ? "Demo Account" : "User",
+              fullName: emailToFind.startsWith("demo") || emailToFind.endsWith("@zenithform.com") ? "Demo Account" : "User",
               email: emailToFind,
               emailVerified: true,
             })
