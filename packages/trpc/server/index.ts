@@ -17,4 +17,5 @@ export const serverRouter = router({
 });
 
 export { createContext } from "./context";
+export * from "./services";
 export type ServerRouter = typeof serverRouter;
