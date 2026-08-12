@@ -171,9 +171,10 @@ export default async function Home() {
           <div className="container max-w-6xl mx-auto px-4 text-center relative z-10">
             
             {/* Announcement Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary mb-8 shadow-sm animate-fade-in-up">
-              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              <span>Next-Gen Interactive Form Builder — High Conversion & Type-Safe</span>
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-semibold text-primary mb-8 shadow-sm animate-fade-in-up">
+              <Sparkles className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+              <span className="hidden sm:inline">Next-Gen Interactive Form Builder — High Conversion & Type-Safe</span>
+              <span className="sm:hidden">Next-Gen Type-Safe Form Builder ⚡</span>
             </div>
 
             {/* Main Headline */}
@@ -225,26 +226,26 @@ export default async function Home() {
         </section>
 
         {/* 2. TECHNICAL METRICS & ENGINEERING BENCHMARKS GRID */}
-        <section className="py-12 border-y border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-900/40 backdrop-blur-sm shadow-sm">
+        <section className="py-10 sm:py-12 border-y border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-900/40 backdrop-blur-sm shadow-sm">
           <div className="container max-w-6xl mx-auto px-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
               {metrics.map((m, idx) => {
                 const IconComponent = m.icon;
                 return (
                   <div
                     key={idx}
-                    className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-muted/20 space-y-2 transition-all duration-300 hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-0.5"
+                    className="p-3.5 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-muted/20 space-y-1.5 sm:space-y-2 transition-all duration-300 hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-0.5"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{m.label}</span>
-                      <div className={`p-2 rounded-xl ${m.bg} ${m.color}`}>
-                        <IconComponent className="h-4 w-4" />
+                      <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">{m.label}</span>
+                      <div className={`p-1.5 sm:p-2 rounded-xl ${m.bg} ${m.color}`}>
+                        <IconComponent className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </div>
                     </div>
-                    <div className="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                    <div className="text-xl sm:text-3xl font-extrabold tracking-tight text-foreground dark:text-zinc-100">
                       {m.value}
                     </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{m.desc}</p>
+                    <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">{m.desc}</p>
                   </div>
                 );
               })}
@@ -384,16 +385,16 @@ export default async function Home() {
                 </div>
 
                 {/* Styled Code Snippet Window */}
-                <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 font-mono text-[11px] leading-relaxed text-slate-300 overflow-x-auto shadow-inner relative z-10">
-                  <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-[10px] text-muted-foreground">
+                <div className="rounded-2xl border border-zinc-200 dark:border-slate-800 bg-zinc-100 dark:bg-slate-950 p-4 font-mono text-[11px] leading-relaxed text-slate-800 dark:text-slate-300 overflow-x-auto shadow-inner relative z-10">
+                  <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-200 dark:border-slate-800 text-[10px] text-muted-foreground">
                     <span>schema.ts</span>
-                    <span className="text-purple-400">Zod v4</span>
+                    <span className="text-purple-600 dark:text-purple-400 font-semibold">Zod v4</span>
                   </div>
                   <pre>
-                    <span className="text-purple-400">const</span> <span className="text-blue-300">fieldSchema</span> = <span className="text-emerald-400">z</span>.object(&#123;{"\n"}
-                    {"  "}<span className="text-slate-300">id:</span> <span className="text-emerald-400">z</span>.string().uuid(),{"\n"}
-                    {"  "}<span className="text-slate-300">label:</span> <span className="text-emerald-400">z</span>.string().min(<span className="text-amber-400">2</span>),{"\n"}
-                    {"  "}<span className="text-slate-300">type:</span> <span className="text-emerald-400">z</span>.enum([<span className="text-amber-300">&quot;choice&quot;</span>, <span className="text-amber-300">&quot;rating&quot;</span>]),{"\n"}
+                    <span className="text-purple-600 dark:text-purple-400">const</span> <span className="text-blue-600 dark:text-blue-300">fieldSchema</span> = <span className="text-emerald-600 dark:text-emerald-400">z</span>.object(&#123;{"\n"}
+                    {"  "}<span className="text-zinc-700 dark:text-slate-300">id:</span> <span className="text-emerald-600 dark:text-emerald-400">z</span>.string().uuid(),{"\n"}
+                    {"  "}<span className="text-zinc-700 dark:text-slate-300">label:</span> <span className="text-emerald-600 dark:text-emerald-400">z</span>.string().min(<span className="text-amber-600 dark:text-amber-400">2</span>),{"\n"}
+                    {"  "}<span className="text-zinc-700 dark:text-slate-300">type:</span> <span className="text-emerald-600 dark:text-emerald-400">z</span>.enum([<span className="text-amber-600 dark:text-amber-300">&quot;choice&quot;</span>, <span className="text-amber-600 dark:text-amber-300">&quot;rating&quot;</span>]),{"\n"}
                     &#125;);
                   </pre>
                 </div>
@@ -530,7 +531,7 @@ export default async function Home() {
                   key={idx}
                   className={`flex flex-col justify-between relative transition-all duration-300 ${
                     tier.highlight
-                      ? "border-indigo-500/80 shadow-2xl ring-2 ring-indigo-500/30 bg-white dark:bg-zinc-950 scale-[1.03] z-10"
+                      ? "border-indigo-500/80 shadow-2xl ring-2 ring-indigo-500/30 bg-white dark:bg-zinc-950 md:scale-[1.03] scale-100 z-10"
                       : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-950 shadow-sm"
                   }`}
                 >
@@ -574,7 +575,9 @@ export default async function Home() {
                       asChild
                       variant={tier.buttonVariant}
                       className={`w-full font-semibold ${
-                        tier.highlight ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md" : ""
+                        tier.highlight
+                          ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md"
+                          : "border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                       }`}
                     >
                       <Link href="/login">
