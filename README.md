@@ -1,13 +1,46 @@
 # 🎯 Zenith Form — Typeform-Style Form Builder SaaS
 
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge\&logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge\&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge\&logo=typescript\&logoColor=white)](https://www.typescriptlang.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-9+-F69220?style=for-the-badge\&logo=pnpm\&logoColor=white)](https://pnpm.io/)
-[![Turborepo](https://img.shields.io/badge/Turborepo-Monorepo-EF4444?style=for-the-badge\&logo=turborepo\&logoColor=white)](https://turbo.build/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge\&logo=postgresql\&logoColor=white)](https://www.postgresql.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-9+-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
+[![Turborepo](https://img.shields.io/badge/Turborepo-Monorepo-EF4444?style=for-the-badge&logo=turborepo&logoColor=white)](https://turbo.build/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
 > A **production-inspired Turborepo monorepo** built with Next.js 16, Express, tRPC, Zod, and Drizzle ORM. Designed to demonstrate full-stack architecture, shared package contracts, database design with PostgreSQL JSONB, and clean authorization patterns.
+
+---
+
+## 🌐 Live Demo & Documentation
+
+* **🌐 Live Web Application**: [https://zenith-form-web.vercel.app/](https://zenith-form-web.vercel.app/)
+* **⚡ Production API Server**: [https://zenith-form.onrender.com/](https://zenith-form.onrender.com/)
+* **📖 Interactive API Documentation**: [https://zenith-form.onrender.com/docs](https://zenith-form.onrender.com/docs)
+
+---
+
+## 🔑 Key Features
+
+1. **Authentication & Guest Access**
+   * Google OAuth 2.0 flow with JWT session management.
+   * Instant Guest Demo Login with unique per-session isolation requiring no OAuth setup.
+
+2. **Form & Field Engine**
+   * Create, edit, publish, unpublish, and delete forms with live preview canvas.
+   * Supports **10 dynamic field types**: `short_text`, `long_text`, `email`, `number`, `phone`, `single_select`, `multi_select`, `checkbox`, `rating`, `date`.
+
+3. **Public Questionnaire & Submissions**
+   * Step-by-step Typeform-style UX with progress tracking.
+   * Service-validated answer constraints matching frontend rules.
+   * Built-in request-window rate limiting per form/IP combination.
+
+4. **Analytics & Data Export**
+   * On-demand submission counters and per-field answer breakdowns.
+   * Choice distribution percentages and rating averages.
+   * One-click CSV export and JSON-compatible API response retrieval.
+
+5. **API Documentation**
+   * Automatically generated OpenAPI 3.0 specs available through the Scalar UI at `/docs`.
 
 ---
 
@@ -73,10 +106,10 @@ sequenceDiagram
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+## 🛠️ Tech Stack & Monorepo Structure
 
 * **Frontend**: Next.js 16 (App Router), React 19, Tailwind CSS, `shadcn/ui`.
-* **Backend API**: Express.js with `trpc-to-openapi` and `@scalar/express-api-reference` (`http://localhost:8000/docs`).
+* **Backend API**: Express.js with `trpc-to-openapi` and `@scalar/express-api-reference`.
 * **API & Data Contracts**: Strongly typed API contracts using tRPC v11 & Zod schema validation across client and server.
 * **Database & ORM**: PostgreSQL with Drizzle ORM (JSONB for dynamic form schemas & flexible response storage).
 * **Authentication & Sessions**: Google OAuth 2.0 + Instant Guest Demo Login using HTTP-only JWT cookies.
@@ -118,6 +151,17 @@ sequenceDiagram
 
 ---
 
+## ☁️ Production Deployment
+
+Zenith Form is deployed across the following cloud infrastructure:
+
+* **Web Frontend**: Hosted on **Vercel** (`apps/web`) with automatic deployments from GitHub.
+* **Backend API**: Hosted on **Render** (`apps/api`) as a Node.js web service.
+* **Database**: Hosted on **Supabase** (PostgreSQL 16) utilizing JSONB columns.
+* **Database Schema & Migrations**: Managed via **Drizzle ORM** with versioned migration files in `packages/database/drizzle`.
+
+---
+
 ## 📁 Repository Structure
 
 ```text
@@ -135,37 +179,7 @@ zenith-form/
 
 ---
 
-## 🔑 Key Features
-
-1. **Authentication & Guest Access**
-
-   * Google OAuth 2.0 flow with JWT session management.
-   * Instant Guest Demo Login (`demo@zenithform.com`) requiring no OAuth setup.
-
-2. **Form & Field Engine**
-
-   * Create, edit, publish, unpublish, and delete forms with live preview canvas.
-   * Supports **10 dynamic field types**: `short_text`, `long_text`, `email`, `number`, `phone`, `single_select`, `multi_select`, `checkbox`, `rating`, `date`.
-
-3. **Public Questionnaire & Submissions**
-
-   * Step-by-step Typeform-style UX with progress tracking.
-   * Service-validated answer constraints matching frontend rules.
-   * Built-in request-window rate limiting per form/IP combination.
-
-4. **Analytics & Data Export**
-
-   * On-demand submission counters and per-field answer breakdowns.
-   * Choice distribution percentages and rating averages.
-   * One-click CSV export and JSON-compatible API response retrieval.
-
-5. **API Documentation**
-
-   * Automatically generated OpenAPI 3.0 specs available through the Scalar UI at `/docs`.
-
----
-
-## 🚀 Quickstart & Setup
+## 🚀 Quickstart & Local Setup
 
 ### 1. Prerequisites
 
@@ -173,9 +187,8 @@ zenith-form/
 * pnpm 9+
 * Docker Desktop (for PostgreSQL container)
 
-### 2. Environment Setup
-
 ### 2. Setup Environment Variables
+
 Copy `.env.example` to `.env` in the root:
 
 ```bash
@@ -199,8 +212,6 @@ pnpm install
 ```bash
 pnpm db:migrate
 ```
-
-> **Note:** Demo forms are automatically created for the guest account when using the Guest Demo flow.
 
 ### 6. Start Local Development
 
