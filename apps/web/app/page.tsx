@@ -11,6 +11,7 @@ import {
 } from "~/components/ui/accordion";
 import { InteractiveDemo } from "~/components/interactive-demo";
 import { ArchitectureShowcase } from "~/components/architecture-showcase";
+import { TiltCard } from "~/components/ui/tilt-card";
 import { api } from "~/trpc/server";
 import { getApiDocsUrl, getOpenApiSpecUrl } from "~/lib/utils";
 import {
@@ -295,7 +296,7 @@ export default async function Home() {
         </section>
 
         {/* 5. FEATURE HIGHLIGHTS - BENTO GRID */}
-        <section id="features" className="py-20 border-y border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/70 dark:bg-zinc-900/30 relative overflow-hidden">
+        <section id="features" className="py-20 border-y border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/70 dark:bg-zinc-900/30 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-purple-100/40 dark:bg-purple-900/10 blur-[140px] rounded-full pointer-events-none -z-10" />
           <div className="container max-w-6xl mx-auto px-4 relative z-10">
             
@@ -315,192 +316,200 @@ export default async function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
               {/* CARD 1: VISUAL FORM BUILDER (Span 2 cols) */}
-              <div className="md:col-span-2 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/5 group relative overflow-hidden shadow-sm">
-                <div className="space-y-3 mb-6 relative z-10">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500">
-                      <FormInput className="h-5 w-5" />
+              <TiltCard maxTilt={8} scale={1.01} glare={true} glareColor="rgba(99, 102, 241, 0.15)" className="md:col-span-2 h-full">
+                <div className="h-full rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/5 group relative overflow-hidden shadow-sm">
+                  <div className="space-y-3 mb-6 relative z-10">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500">
+                        <FormInput className="h-5 w-5" />
+                      </div>
+                      <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
+                        Dynamic Builder UI
+                      </Badge>
                     </div>
-                    <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
-                      Dynamic Builder UI
-                    </Badge>
+                    <h3 className="text-2xl font-bold tracking-tight">Visual Form Builder</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xl">
+                      Create distraction-free, single-question forms with interactive field creation, real-time preview, drag-and-drop ordering, and validation rules.
+                    </p>
                   </div>
-                  <h3 className="text-2xl font-bold tracking-tight">Visual Form Builder</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xl">
-                    Create distraction-free, single-question forms with interactive field creation, real-time preview, drag-and-drop ordering, and validation rules.
-                  </p>
+
+                  {/* Sleek UI Mockup */}
+                  <div className="rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/40 p-4 sm:p-5 space-y-3 relative z-10 backdrop-blur-sm shadow-inner">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pb-2 border-b border-border/60">
+                      <div className="flex items-center gap-1.5 font-medium">
+                        <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
+                        <span>Form Field Canvas</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Badge variant="outline" className="text-[10px] bg-background">Required</Badge>
+                        <Badge variant="outline" className="text-[10px] bg-indigo-500/10 text-indigo-500 border-indigo-500/30">Single Select</Badge>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="text-xs font-semibold text-foreground">
+                        Question 1: What is your primary engineering stack?
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div className="p-2.5 rounded-xl border border-indigo-500/80 bg-indigo-500/10 font-medium text-foreground flex items-center justify-between shadow-sm">
+                          <span>⚡ Next.js + tRPC</span>
+                          <Check className="h-3.5 w-3.5 text-indigo-500 stroke-[3]" />
+                        </div>
+                        <div className="p-2.5 rounded-xl border border-border/60 bg-background/60 text-muted-foreground hover:text-foreground transition-colors flex items-center justify-between">
+                          <span>🚀 React + REST API</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl border border-border/60 bg-background/60 text-muted-foreground hover:text-foreground transition-colors flex items-center justify-between">
+                          <span>🛡️ Full-Stack Vue</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Glow Background Gradient */}
+                  <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all pointer-events-none" />
                 </div>
-
-                {/* Sleek UI Mockup */}
-                <div className="rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/40 p-4 sm:p-5 space-y-3 relative z-10 backdrop-blur-sm shadow-inner">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground pb-2 border-b border-border/60">
-                    <div className="flex items-center gap-1.5 font-medium">
-                      <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
-                      <span>Form Field Canvas</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Badge variant="outline" className="text-[10px] bg-background">Required</Badge>
-                      <Badge variant="outline" className="text-[10px] bg-indigo-500/10 text-indigo-500 border-indigo-500/30">Single Select</Badge>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-xs font-semibold text-foreground">
-                      Question 1: What is your primary engineering stack?
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                      <div className="p-2.5 rounded-xl border border-indigo-500/80 bg-indigo-500/10 font-medium text-foreground flex items-center justify-between shadow-sm">
-                        <span>⚡ Next.js + tRPC</span>
-                        <Check className="h-3.5 w-3.5 text-indigo-500 stroke-[3]" />
-                      </div>
-                      <div className="p-2.5 rounded-xl border border-border/60 bg-background/60 text-muted-foreground hover:text-foreground transition-colors flex items-center justify-between">
-                        <span>🚀 React + REST API</span>
-                      </div>
-                      <div className="p-2.5 rounded-xl border border-border/60 bg-background/60 text-muted-foreground hover:text-foreground transition-colors flex items-center justify-between">
-                        <span>🛡️ Full-Stack Vue</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Glow Background Gradient */}
-                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all pointer-events-none" />
-              </div>
+              </TiltCard>
 
               {/* CARD 2: FULL-STACK TYPE SAFETY (Span 1 col) */}
-              <div className="md:col-span-1 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-purple-500/40 hover:shadow-xl hover:shadow-purple-500/5 group relative overflow-hidden shadow-sm">
-                <div className="space-y-3 mb-6 relative z-10">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500">
-                      <Code2 className="h-5 w-5" />
+              <TiltCard maxTilt={10} scale={1.02} glare={true} glareColor="rgba(168, 85, 247, 0.15)" className="md:col-span-1 h-full">
+                <div className="h-full rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-purple-500/40 hover:shadow-xl hover:shadow-purple-500/5 group relative overflow-hidden shadow-sm">
+                  <div className="space-y-3 mb-6 relative z-10">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500">
+                        <Code2 className="h-5 w-5" />
+                      </div>
+                      <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
+                        Zod + tRPC
+                      </Badge>
                     </div>
-                    <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
-                      Zod + tRPC
-                    </Badge>
+                    <h3 className="text-xl font-bold tracking-tight">Full-Stack Type Safety</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Shared schemas across `@repo/trpc` ensure 100% type contract match from client forms to server handlers.
+                    </p>
                   </div>
-                  <h3 className="text-xl font-bold tracking-tight">Full-Stack Type Safety</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Shared schemas across `@repo/trpc` ensure 100% type contract match from client forms to server handlers.
-                  </p>
-                </div>
 
-                {/* Styled Code Snippet Window */}
-                <div className="rounded-2xl border border-zinc-200 dark:border-slate-800 bg-zinc-100 dark:bg-slate-950 p-4 font-mono text-[11px] leading-relaxed text-slate-800 dark:text-slate-300 overflow-x-auto shadow-inner relative z-10">
-                  <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-200 dark:border-slate-800 text-[10px] text-muted-foreground">
-                    <span>schema.ts</span>
-                    <span className="text-purple-600 dark:text-purple-400 font-semibold">Zod v4</span>
+                  {/* Styled Code Snippet Window */}
+                  <div className="rounded-2xl border border-zinc-200 dark:border-slate-800 bg-zinc-100 dark:bg-slate-950 p-4 font-mono text-[11px] leading-relaxed text-slate-800 dark:text-slate-300 overflow-x-auto shadow-inner relative z-10">
+                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-200 dark:border-slate-800 text-[10px] text-muted-foreground">
+                      <span>schema.ts</span>
+                      <span className="text-purple-600 dark:text-purple-400 font-semibold">Zod v4</span>
+                    </div>
+                    <pre>
+                      <span className="text-purple-600 dark:text-purple-400">const</span> <span className="text-blue-600 dark:text-blue-300">fieldSchema</span> = <span className="text-emerald-600 dark:text-emerald-400">z</span>.object(&#123;{"\n"}
+                      {"  "}<span className="text-zinc-700 dark:text-slate-300">id:</span> <span className="text-emerald-600 dark:text-emerald-400">z</span>.string().uuid(),{"\n"}
+                      {"  "}<span className="text-zinc-700 dark:text-slate-300">label:</span> <span className="text-emerald-600 dark:text-emerald-400">z</span>.string().min(<span className="text-amber-600 dark:text-amber-400">2</span>),{"\n"}
+                      {"  "}<span className="text-zinc-700 dark:text-slate-300">type:</span> <span className="text-emerald-600 dark:text-emerald-400">z</span>.enum([<span className="text-amber-600 dark:text-amber-300">&quot;choice&quot;</span>, <span className="text-amber-600 dark:text-amber-300">&quot;rating&quot;</span>]),{"\n"}
+                      &#125;);
+                    </pre>
                   </div>
-                  <pre>
-                    <span className="text-purple-600 dark:text-purple-400">const</span> <span className="text-blue-600 dark:text-blue-300">fieldSchema</span> = <span className="text-emerald-600 dark:text-emerald-400">z</span>.object(&#123;{"\n"}
-                    {"  "}<span className="text-zinc-700 dark:text-slate-300">id:</span> <span className="text-emerald-600 dark:text-emerald-400">z</span>.string().uuid(),{"\n"}
-                    {"  "}<span className="text-zinc-700 dark:text-slate-300">label:</span> <span className="text-emerald-600 dark:text-emerald-400">z</span>.string().min(<span className="text-amber-600 dark:text-amber-400">2</span>),{"\n"}
-                    {"  "}<span className="text-zinc-700 dark:text-slate-300">type:</span> <span className="text-emerald-600 dark:text-emerald-400">z</span>.enum([<span className="text-amber-600 dark:text-amber-300">&quot;choice&quot;</span>, <span className="text-amber-600 dark:text-amber-300">&quot;rating&quot;</span>]),{"\n"}
-                    &#125;);
-                  </pre>
-                </div>
 
-                {/* Glow Background Gradient */}
-                <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all pointer-events-none" />
-              </div>
+                  {/* Glow Background Gradient */}
+                  <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all pointer-events-none" />
+                </div>
+              </TiltCard>
 
               {/* CARD 3: REAL-TIME RESPONSE ANALYTICS (Span 1 col) */}
-              <div className="md:col-span-1 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-amber-500/40 hover:shadow-xl hover:shadow-amber-500/5 group relative overflow-hidden shadow-sm">
-                <div className="space-y-3 mb-6 relative z-10">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
-                      <BarChart3 className="h-5 w-5" />
+              <TiltCard maxTilt={10} scale={1.02} glare={true} glareColor="rgba(245, 158, 11, 0.15)" className="md:col-span-1 h-full">
+                <div className="h-full rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-amber-500/40 hover:shadow-xl hover:shadow-amber-500/5 group relative overflow-hidden shadow-sm">
+                  <div className="space-y-3 mb-6 relative z-10">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
+                        <BarChart3 className="h-5 w-5" />
+                      </div>
+                      <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
+                        Live Metrics
+                      </Badge>
                     </div>
-                    <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
-                      Live Metrics
-                    </Badge>
+                    <h3 className="text-xl font-bold tracking-tight">Real-Time Analytics</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Track submission velocity, drop-off rates, and field aggregates with zero latency overhead.
+                    </p>
                   </div>
-                  <h3 className="text-xl font-bold tracking-tight">Real-Time Analytics</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Track submission velocity, drop-off rates, and field aggregates with zero latency overhead.
-                  </p>
+
+                  {/* Mini Chart & Progress Metrics */}
+                  <div className="rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/30 p-4 space-y-3 relative z-10 backdrop-blur-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">Completion Rate</span>
+                      <span className="text-sm font-extrabold text-amber-500 font-mono">94.2%</span>
+                    </div>
+
+                    <div className="space-y-2 text-[11px]">
+                      <div>
+                        <div className="flex justify-between text-muted-foreground mb-1">
+                          <span>Q1: Goal Selection</span>
+                          <span className="font-semibold text-foreground">98%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-500 rounded-full w-[98%]" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between text-muted-foreground mb-1">
+                          <span>Q2: Speed Rating</span>
+                          <span className="font-semibold text-foreground">94%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-500 rounded-full w-[94%]" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Glow Background Gradient */}
+                  <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all pointer-events-none" />
                 </div>
-
-                {/* Mini Chart & Progress Metrics */}
-                <div className="rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/30 p-4 space-y-3 relative z-10 backdrop-blur-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Completion Rate</span>
-                    <span className="text-sm font-extrabold text-amber-500 font-mono">94.2%</span>
-                  </div>
-
-                  <div className="space-y-2 text-[11px]">
-                    <div>
-                      <div className="flex justify-between text-muted-foreground mb-1">
-                        <span>Q1: Goal Selection</span>
-                        <span className="font-semibold text-foreground">98%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-500 rounded-full w-[98%]" />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between text-muted-foreground mb-1">
-                        <span>Q2: Speed Rating</span>
-                        <span className="font-semibold text-foreground">94%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-500 rounded-full w-[94%]" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Glow Background Gradient */}
-                <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all pointer-events-none" />
-              </div>
+              </TiltCard>
 
               {/* CARD 4: PRIVACY-FIRST RATE LIMITING (Span 2 cols) */}
-              <div className="md:col-span-2 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/5 group relative overflow-hidden shadow-sm">
-                <div className="space-y-3 mb-6 relative z-10">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
-                      <ShieldCheck className="h-5 w-5" />
+              <TiltCard maxTilt={8} scale={1.01} glare={true} glareColor="rgba(16, 185, 129, 0.15)" className="md:col-span-2 h-full">
+                <div className="h-full rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/5 group relative overflow-hidden shadow-sm">
+                  <div className="space-y-3 mb-6 relative z-10">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+                        <ShieldCheck className="h-5 w-5" />
+                      </div>
+                      <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
+                        GDPR & Spam Protection
+                      </Badge>
                     </div>
-                    <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
-                      GDPR & Spam Protection
-                    </Badge>
+                    <h3 className="text-2xl font-bold tracking-tight">Privacy-First Rate Limiting</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xl">
+                      In-memory sliding window rate limiter protects forms against DDoS and submission spam using SHA-256 salted IP hashes without ever storing raw PII data.
+                    </p>
                   </div>
-                  <h3 className="text-2xl font-bold tracking-tight">Privacy-First Rate Limiting</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xl">
-                    In-memory sliding window rate limiter protects forms against DDoS and submission spam using SHA-256 salted IP hashes without ever storing raw PII data.
-                  </p>
+
+                  {/* Security Pipeline Visual */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 relative z-10 text-xs">
+                    <div className="p-3.5 rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/40 space-y-1">
+                      <div className="font-semibold text-foreground flex items-center gap-1.5">
+                        <Zap className="h-3.5 w-3.5 text-amber-500" />
+                        <span>5 req / min Limit</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">Sliding window algorithm prevents spam attacks.</p>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 space-y-1">
+                      <div className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                        <Lock className="h-3.5 w-3.5 text-emerald-500" />
+                        <span>Salted SHA-256</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">Submitter IP is irreversibly hashed before storage.</p>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/40 space-y-1">
+                      <div className="font-semibold text-foreground flex items-center gap-1.5">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-blue-500" />
+                        <span>0% PII Storage</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">Full compliance with privacy standards and GDPR.</p>
+                    </div>
+                  </div>
+
+                  {/* Glow Background Gradient */}
+                  <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all pointer-events-none" />
                 </div>
-
-                {/* Security Pipeline Visual */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 relative z-10 text-xs">
-                  <div className="p-3.5 rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/40 space-y-1">
-                    <div className="font-semibold text-foreground flex items-center gap-1.5">
-                      <Zap className="h-3.5 w-3.5 text-amber-500" />
-                      <span>5 req / min Limit</span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">Sliding window algorithm prevents spam attacks.</p>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 space-y-1">
-                    <div className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                      <Lock className="h-3.5 w-3.5 text-emerald-500" />
-                      <span>Salted SHA-256</span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">Submitter IP is irreversibly hashed before storage.</p>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl border border-border/80 bg-zinc-50/80 dark:bg-muted/40 space-y-1">
-                    <div className="font-semibold text-foreground flex items-center gap-1.5">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-blue-500" />
-                      <span>0% PII Storage</span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">Full compliance with privacy standards and GDPR.</p>
-                  </div>
-                </div>
-
-                {/* Glow Background Gradient */}
-                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all pointer-events-none" />
-              </div>
+              </TiltCard>
 
             </div>
 
